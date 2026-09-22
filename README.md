@@ -14,3 +14,7 @@ await Bride.start({
 ```
 
 WASM will be loaded and executed, and the HTML element with the id `app` will be used as the root for the application.
+
+---
+
+> Let's Compile the Web.

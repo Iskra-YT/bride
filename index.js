@@ -4,6 +4,7 @@ import { loadWasm } from "./runtime/wasm";
 export const Bride = {
     async start(options) {
         const { wasm, root = "#app" } = options;
+        window.Bride = Bride;
 
         const element = document.querySelector(root);
         if (!element) {
