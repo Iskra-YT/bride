@@ -1,4 +1,4 @@
-export async function loadWasm(path) {
+export async function loadWasm(path, imports = {}) {
     const response = await fetch(path);
 
     if (!response.ok) {
@@ -7,7 +7,9 @@ export async function loadWasm(path) {
 
     const instance = await WebAssembly.instantiateStreaming(
         response,
-        {}
+        {
+            env: imports
+        }
     );
 
     return instance;

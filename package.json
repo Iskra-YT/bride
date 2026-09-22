@@ -28,5 +28,8 @@
   "bugs": {
     "url": "https://github.com/Iskra-YT/bride/issues"
   },
-  "homepage": "https://github.com/Iskra-YT/bride#readme"
+  "homepage": "https://github.com/Iskra-YT/bride#readme",
+  "devDependencies": {
+    "assemblyscript": "^0.28.20"
+  }
 }
