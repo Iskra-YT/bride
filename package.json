@@ -1,0 +1,32 @@
+{
+  "name": "bride",
+  "version": "1.0.0",
+  "description": "Bride is the runtime bridge between WebAssembly and the Web.",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "wasm",
+    "webassembly",
+    "wasm-runtime",
+    "webassembly-browser",
+    "browser-runtime",
+    "dom",
+    "web",
+    "frontend",
+    "ui",
+    "bridge"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Iskra-YT/bride.git"
+  },
+  "author": "Szymon Izdebski",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Iskra-YT/bride/issues"
+  },
+  "homepage": "https://github.com/Iskra-YT/bride#readme"
+}
