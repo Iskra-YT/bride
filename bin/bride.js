@@ -38,5 +38,6 @@ Bride CLI
 Commands:
   bride new
   bride build
+  bride dev
 `);
 }
