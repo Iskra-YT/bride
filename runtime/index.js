@@ -1,4 +1,4 @@
-import { loadWasm } from "./runtime/wasm";
+import { loadWasm } from "./wasm";
 
 let instance = null;
 
