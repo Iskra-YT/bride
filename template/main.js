@@ -1,6 +1,6 @@
-import { Bride } from "bride";
+import { Bride } from "./bride.js";
 
 await Bride.start({
-    wasm: "./build/app.wasm",
+    wasm: "./main.wasm",
     root: "#app"
 });

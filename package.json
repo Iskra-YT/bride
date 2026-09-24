@@ -3,14 +3,15 @@
   "version": "1.0.0",
   "description": "Bride is the runtime bridge between WebAssembly and the Web.",
   "type": "module",
-  "main": "./runtime/index.js",
+  "main": "./runtime/bride.js",
   "bin": {
     "bride": "./bin/bride.js"
   },
   "files": [
     "bin",
     "runtime",
-    "template"
+    "template",
+    "lib"
   ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -36,5 +37,8 @@
   "bugs": {
     "url": "https://github.com/Iskra-YT/bride/issues"
   },
-  "homepage": "https://github.com/Iskra-YT/bride#readme"
+  "homepage": "https://github.com/Iskra-YT/bride#readme",
+  "dependencies": {
+    "@bjorn3/browser_wasi_shim": "^0.4.2"
+  }
 }
