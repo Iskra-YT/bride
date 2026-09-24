@@ -2,6 +2,8 @@
 
 Bride is the runtime bridge between WebAssembly and the Web. 
 
+**Main idea**: Any language can be a web language.
+
 ## Supported Languages
 
 | Language | Supported |
