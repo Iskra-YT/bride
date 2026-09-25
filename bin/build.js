@@ -1,5 +1,5 @@
 import { execFileSync } from "node:child_process";
-import { cp } from "node:fs/promises";
+import { cp, rm } from "node:fs/promises";
 import { readFileSync, existsSync, mkdirSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -74,7 +74,7 @@ export async function buildProject() {
         return object;
     });
 
-    const archive = path.join(dist, "libbride.a");
+    const archive = path.join(libBuildDir, "libbride.a");
 
     execFileSync("emar", ["rcs", rel(archive), ...objects.map(rel)]);
 
@@ -94,6 +94,7 @@ export async function buildProject() {
         ]);
 
         console.log(`Built ${rel(output)}`);
+        await rm("dist/lib", { recursive: true, force: true });
     }
 
     await copyData(dist, cwd, brideRoot);

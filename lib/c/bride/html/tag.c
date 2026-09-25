@@ -22,6 +22,9 @@ char* repr_html_tag(HtmlTag* tag) {
         case HTML_TAG_CLICKABLE:
             return repr_clickable_tag(tag);
 
+        case HTML_TAG_FRAGMENT:
+            return repr_fragment_tag(tag);
+
         default:
             return NULL;
     }

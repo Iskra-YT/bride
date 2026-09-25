@@ -3,8 +3,6 @@
 
 #include "./bride/js.h"
 #include "./bride/dispach.h"
-#include "bride/html/tag.h"
-
-#define HTML_TO_CHILDREN(name, child) HtmlTag* name[2] = { (child), NULL }
+#include "./bride/bhlm.h"
 
 #endif // BRIDE_H

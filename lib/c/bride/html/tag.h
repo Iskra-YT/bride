@@ -7,7 +7,8 @@
 typedef enum HtmlTagType {
     HTML_TAG_PARAGRAPH,
     HTML_TAG_TEXT,
-    HTML_TAG_CLICKABLE
+    HTML_TAG_CLICKABLE,
+    HTML_TAG_FRAGMENT
 } HtmlTagType;
 
 typedef struct HtmlAttribute {
@@ -29,5 +30,6 @@ char* repr_html_tag(HtmlTag* tag);
 #include "./p.h"
 #include "./text.h"
 #include "./clickable.h"
+#include "./fragment.h"
 
 #endif // BRIDE_TAG_HTML_H
