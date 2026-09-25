@@ -17,6 +17,10 @@ export async function loadWasm(path, imports = {}) {
         }
     );
 
+    // Gives the shim a handle on the instance so calls that need the
+    // instance's memory (args_get, environ_get, fd_write, ...) work.
+    wasi.initialize(instance.instance);
+
     return instance.instance;
 }
 

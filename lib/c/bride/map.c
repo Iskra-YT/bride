@@ -1,9 +1,15 @@
 #include "./map.h"
 
+#define MAP_INITIAL_CAPACITY 8
+
 void map_init(Map *map) {
     map->size = 0;
-    map->capacity = 8;
+    map->capacity = MAP_INITIAL_CAPACITY;
     map->entries = (MapEntry*)malloc(sizeof(MapEntry) * map->capacity);
+
+    if (!map->entries) {
+        map->capacity = 0;
+    }
 }
 
 void map_insert(Map *map, int key, void *value) {
@@ -15,11 +21,19 @@ void map_insert(Map *map, int key, void *value) {
     }
 
     if (map->size >= map->capacity) {
-        map->capacity *= 2;
-        map->entries = realloc(
+        size_t capacity = map->capacity ? map->capacity * 2 : MAP_INITIAL_CAPACITY;
+
+        MapEntry* entries = (MapEntry*)realloc(
             map->entries,
-            sizeof(MapEntry) * map->capacity
+            sizeof(MapEntry) * capacity
         );
+
+        if (!entries) {
+            return;
+        }
+
+        map->entries = entries;
+        map->capacity = capacity;
     }
 
     map->entries[map->size].key = key;

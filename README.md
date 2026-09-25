@@ -9,7 +9,7 @@ Bride is the runtime bridge between WebAssembly and the Web.
 | Language | Supported |
 |----------|-----------|
 | Rust     | No        |
-| C        | No        |
+| C        | Yes        |
 | C++      | No        |
 
 If you want to add language not listed above, please submit a pull request or create an issue.

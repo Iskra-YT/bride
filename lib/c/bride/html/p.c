@@ -2,19 +2,28 @@
 #include <string.h>
 #include "p.h"
 
-HtmlTag* create_p_tag(HtmlTag** children) {
+HtmlTag* create_p_tag(HtmlTag** children, HtmlAttribute** attributes) {
     return create_html_tag(
         HTML_TAG_PARAGRAPH,
-        NULL,
+        attributes,
         children
     );
 }
 
 char* repr_p_tag(HtmlTag* tag) {
-    size_t size = 8; // "<p>" + "</p>" + '\0'
+    if (!tag) {
+        return NULL;
+    }
+
+    size_t size = 8; // "<p" + ">" + "</p>" + '\0'
+    size += repr_html_attributes_length(tag);
 
     for (HtmlTag** child = tag->childrens; child && *child; child++) {
         char* child_repr = repr_html_tag(*child);
+
+        if (!child_repr) {
+            continue;
+        }
 
         size += strlen(child_repr);
         free(child_repr);
@@ -26,10 +35,16 @@ char* repr_p_tag(HtmlTag* tag) {
         return NULL;
     }
 
-    strcpy(result, "<p>");
+    strcpy(result, "<p");
+    repr_html_attributes(tag, result);
+    strcat(result, ">");
 
     for (HtmlTag** child = tag->childrens; child && *child; child++) {
         char* child_repr = repr_html_tag(*child);
+
+        if (!child_repr) {
+            continue;
+        }
 
         strcat(result, child_repr);
         free(child_repr);
