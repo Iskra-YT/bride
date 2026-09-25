@@ -2,6 +2,7 @@
   "name": "bride",
   "version": "1.0.0",
   "description": "Bride is the runtime bridge between WebAssembly and the Web.",
+  "language": "c",
   "type": "module",
   "main": "./runtime/bride.js",
   "bin": {

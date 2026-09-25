@@ -3,18 +3,7 @@
 
 #include "./tag.h"
 
-HtmlTag* create_p_tag(HtmlTag** inside) {
-    HtmlTagType tag = HTML_TAG_PARAGRAPH;
-    char** attributes = NULL;
-    HtmlTag** childrens = inside;
-
-    *inside = create_html_tag(tag, attributes, childrens);
-    return *inside;
-}
-
-char* repr_p_tag(HtmlTag* tag) {
-    // <p>repr_childrens</p>
-    // TODO: Implement the representation of the <p> tag with its children
-}
+HtmlTag* create_p_tag(HtmlTag** children);
+char* repr_p_tag(HtmlTag* tag);
 
 #endif // BRIDE_P_HTML_H

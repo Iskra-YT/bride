@@ -1,3 +1,5 @@
 testProject/
 node_modules/
 *.tgz
+.vscode/
+dist/

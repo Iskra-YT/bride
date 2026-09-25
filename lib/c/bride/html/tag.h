@@ -4,23 +4,21 @@
 #include <stdlib.h>
 #include <string.h>
 
-enum HtmlTagType {
+typedef enum HtmlTagType {
     HTML_TAG_PARAGRAPH,
     HTML_TAG_TEXT
-};
+} HtmlTagType;
 
-struct HtmlTag {
+typedef struct HtmlTag {
     HtmlTagType tag;
     char** attributes;
-    HtmlTag** childrens;
-};
+    struct HtmlTag** childrens;
+} HtmlTag;
 
-HtmlTag* create_html_tag(const HtmlTagType tag, char** attributes, HtmlTag** childrens) {
-    HtmlTag* new_tag = (HtmlTag*)malloc(sizeof(HtmlTag));
-    new_tag->tag = tag;
-    new_tag->attributes = attributes;
-    new_tag->childrens = childrens;
-    return new_tag;
-}
+HtmlTag* create_html_tag(HtmlTagType tag, char** attributes, HtmlTag** childrens);
+char* repr_html_tag(HtmlTag* tag);
+
+#include "./p.h"
+#include "./text.h"
 
 #endif // BRIDE_TAG_HTML_H

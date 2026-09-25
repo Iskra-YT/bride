@@ -1,14 +1,19 @@
 import { execFileSync } from "node:child_process";
 import { cp } from "node:fs/promises";
-import { hasEmcc } from "./utils.js";
-import fs from "node:fs";
+import { readFileSync, existsSync, mkdirSync } from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { hasEmcc, findFiles } from "./utils.js";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export async function buildProject() {
+    const cwd = process.cwd();
+
     console.log("Building Bride project...");
 
     const packageJson = JSON.parse(
-        fs.readFileSync(path.join(process.cwd(), "package.json"), "utf8"),
+        readFileSync(path.join(cwd, "package.json"), "utf8"),
     );
     const projectLanguage = packageJson.language;
     const src = packageJson.src || "src";
@@ -29,58 +34,102 @@ export async function buildProject() {
         );
     }
 
-    const dist = path.join(process.cwd(), "dist");
+    const installedBride = path.join(cwd, "node_modules", "bride");
 
-    fs.mkdirSync(dist, {
+    const brideRoot = existsSync(path.join(installedBride, "lib", "c")) ? installedBride : path.join(__dirname, "..");
+
+    const libDir = path.join(brideRoot, "lib", "c");
+    const projectSrcDir = path.join(cwd, src);
+
+    const projectSources = findFiles(projectSrcDir, ".c");
+    const librarySources = findFiles(libDir, ".c");
+    const allSources = [...projectSources, ...librarySources];
+
+    if (allSources.length === 0) {
+        throw new Error("No .c files found to compile.");
+    }
+
+    const dist = path.join(cwd, "dist");
+
+    mkdirSync(dist, { recursive: true });
+
+    const rel = (file) => path.relative(cwd, file);
+    const includeArgs = ["-I", rel(libDir)];
+
+    const libBuildDir = path.join(dist, "lib");
+
+    mkdirSync(libBuildDir, { recursive: true });
+
+    const objects = librarySources.map((source) => {
+        const object = path.join(libBuildDir, `${path.parse(source).name}.o`);
+
+        execFileSync("emcc", [
+            "-c",
+            rel(source),
+            "-o",
+            rel(object),
+            ...includeArgs,
+        ]);
+
+        return object;
+    });
+
+    const archive = path.join(dist, "libbride.a");
+
+    execFileSync("emar", ["rcs", rel(archive), ...objects.map(rel)]);
+
+    console.log(`Built ${rel(archive)}`);
+
+    if (projectSources.length > 0) {
+        const output = path.join(dist, "main.wasm");
+
+        execFileSync("emcc", [
+            ...projectSources.map(rel),
+            rel(archive),
+            "-o",
+            rel(output),
+            ...includeArgs,
+            "-s",
+            "WASM=1",
+        ]);
+
+        console.log(`Built ${rel(output)}`);
+    }
+
+    await copyData(dist, cwd, brideRoot);
+}
+
+async function copyData(dist, cwd, brideRoot) {
+    const runtime = path.join(brideRoot, "runtime");
+    const wasi = path.join(cwd, "node_modules", "@bjorn3", "browser_wasi_shim");
+
+    await cp(runtime, dist, { recursive: true });
+
+    await cp(path.join(wasi, "dist"), path.join(dist, "wasi"), {
         recursive: true,
     });
 
-    execFileSync("emcc", [
-        `${src}/main.c`,
-        "-o",
-        `${dist}/main.wasm`,
-        "-I./node_modules/bride/lib/c",
-        "-s",
-        "WASM=1",
-    ]);
-
-    await copyData(dist);
-}
-
-async function copyData(dist) {
-        await cp(
-        "./node_modules/bride/runtime",
-        `${dist}`,
-        { recursive: true }
+    await cp(
+        path.join(wasi, "LICENSE-MIT"),
+        path.join(dist, "wasi", "LICENCE-MIT"),
+        { recursive: true },
     );
 
     await cp(
-        "./node_modules/@bjorn3/browser_wasi_shim/dist",
-        `${dist}/wasi`,
-        { recursive: true }
+        path.join(wasi, "LICENSE-APACHE"),
+        path.join(dist, "wasi", "LICENCE-APACHE"),
+        { recursive: true },
     );
 
-    await cp(
-        "./node_modules/@bjorn3/browser_wasi_shim/LICENSE-MIT",
-        `${dist}/wasi/LICENCE-MIT`,
-        { recursive: true }
-    );
+    const indexHtml = path.join(cwd, "index.html");
 
-    await cp(
-        "./node_modules/@bjorn3/browser_wasi_shim/LICENSE-APACHE",
-        `${dist}/wasi/LICENCE-APACHE`,
-        { recursive: true }
-    );
+    if (existsSync(indexHtml)) {
+        await cp(indexHtml, path.join(dist, "index.html"));
+    }
 
-    await cp(
-        "./index.html",
-        `${dist}/index.html`,
-        { recursive: true }
-    );
+    const mainJs = path.join(cwd, "main.js");
 
-    await cp(
-        "main.js",
-        `${dist}/main.js`,
-        { recursive: true }
-    );
+    if (existsSync(mainJs)) {
+        await cp(mainJs, path.join(dist, "main.js"));
+    }
 }
