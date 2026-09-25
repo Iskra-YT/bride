@@ -11,7 +11,7 @@ HtmlTag* create_p_tag(HtmlTag** children) {
 }
 
 char* repr_p_tag(HtmlTag* tag) {
-    size_t size = 7; // "<p>" + "</p>" + '\0'
+    size_t size = 8; // "<p>" + "</p>" + '\0'
 
     for (HtmlTag** child = tag->childrens; child && *child; child++) {
         char* child_repr = repr_html_tag(*child);

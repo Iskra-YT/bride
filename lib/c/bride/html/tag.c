@@ -3,7 +3,7 @@
 #include "p.h"
 #include "text.h"
 
-HtmlTag* create_html_tag(HtmlTagType tag, char** attributes, HtmlTag** childrens) {
+HtmlTag* create_html_tag(HtmlTagType tag, HtmlAttribute* attributes, HtmlTag** childrens) {
     HtmlTag* new_tag = (HtmlTag*)malloc(sizeof(HtmlTag));
     new_tag->tag = tag;
     new_tag->attributes = attributes;
@@ -19,6 +19,9 @@ char* repr_html_tag(HtmlTag* tag) {
         case HTML_TAG_TEXT:
             return repr_text_tag(tag);
 
+        case HTML_TAG_CLICKABLE:
+            return repr_clickable_tag(tag);
+
         default:
             return NULL;
     }
@@ -30,8 +33,8 @@ void free_html_tag(HtmlTag* tag) {
     }
 
     if (tag->attributes) {
-        for (int i = 0; tag->attributes[i] != NULL; i++) {
-            free(tag->attributes[i]);
+        for (int i = 0; tag->attributes != NULL; i++) {
+            free((void*)tag->attributes);
         }
         free(tag->attributes);
     }

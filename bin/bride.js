@@ -13,6 +13,8 @@ if (command === "new") {
     console.log("Starting Bride development server...");
 
     // TODO: Build and run on dev port 9876
+    // TODO: Watch for changes in src and rebuild automatically
+    // TODO: Push webserver on port 9876
 } else {
     console.log(`
 Bride CLI
