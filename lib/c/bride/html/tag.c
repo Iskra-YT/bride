@@ -26,6 +26,9 @@ char* repr_html_tag(HtmlTag* tag) {
         case HTML_TAG_FRAGMENT:
             return repr_fragment_tag(tag);
 
+        case HTML_TAG_BUTTON:
+            return repr_button_tag(tag);
+
         default:
             return NULL;
     }

@@ -1,18 +1,23 @@
-#include <stdlib.h>
-#include <string.h>
 #include "bride.h"
+#include <string.h>
 
-void change_text(void) {
-    change("p", text("You clicked me!"));
+int count = 0;
+
+void increment(void) {
+    count++;
+    change("#counter", textf("%d", count));
 }
 
 int main(void) {
     ui(
+        text("Clicks:"),
         p(
-            text("Hello, World!"),
-            on_click(change_text)
+            id("counter"),
+            text("0")
+        ),
+        button(
+            text("Increment"),
+            on_click(increment)
         )
     );
-
-    return 0;
 }
