@@ -1,7 +1,7 @@
 {
   "name": "bride-app",
   "version": "0.1.0",
-  "language": "c",
+  "language": "cpp",
   "private": true,
   "dependencies": {
     "bride": "^1.0.0"

@@ -3,7 +3,11 @@
 
 #include "./arg.h"
 
+#ifdef __cplusplus
+#define END ((bride::BrideArg){ bride::BRIDE_END, NULL })
+#else
 #define END ((BrideArg){ BRIDE_END, NULL })
+#endif // __cplusplus
 
 BrideArg __p_impl(BrideArg first, ...);
 #define p(...) __p_impl(__VA_ARGS__, END)

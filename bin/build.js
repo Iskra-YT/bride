@@ -29,6 +29,10 @@ export async function buildProject() {
         // TODO: Create C3 Language Compiler
     } else if (projectLanguage === "rust") {
         // TODO: Crate Rust Language Compiler
+    } else if (projectLanguage === "zig") {
+        // TODO: Create Zig Language Compiler
+    } else if (projectLanguage === "cpp") {
+        // TODO: Create C++ Language Compiler
     }
 
 
