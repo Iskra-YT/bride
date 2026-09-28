@@ -1,19 +1,17 @@
 #include "bride.h"
-#include <string.h>
 
 int count = 0;
 
 void increment(void) {
     count++;
-    change("#counter", textf("%d", count));
+    change("#counter", textf("Clicks: %d", count));
 }
 
 int main(void) {
     ui(
-        text("Clicks:"),
         p(
             id("counter"),
-            text("0")
+            textf("Clicks: %d", count)
         ),
         button(
             text("Increment"),
