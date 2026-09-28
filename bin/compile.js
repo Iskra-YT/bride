@@ -1,4 +1,4 @@
-import { hasEmcc, findFiles, getLibDir } from "./utils.js";
+import { hasEmcc, findFiles, getLibDir, hasEmpp, getBrideFolder } from "./utils.js";
 import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
 import path from "node:path";
@@ -64,6 +64,43 @@ export async function compileC(src, archive) {
     if (projectSources.length > 0) {
         const output = path.join(dist, "main.wasm");
         execFileSync("emcc", [
+            ...projectSources.map(rel),
+            rel(archive),
+            "-o",
+            rel(output),
+            ...includeArgs,
+            "-s",
+            "WASM=1",
+        ]);
+
+        console.log(`Built ${rel(output)}`);
+        await rm("dist/lib", { recursive: true, force: true });
+    }
+}
+
+export async function compileCpp(src, archive) {
+    const cwd = process.cwd();
+    const dist = path.join(cwd, "dist");
+    if (!hasEmpp()) {
+        throw new Error(
+            "Emscripten (em++) is not installed. Please install it to build the project.",
+        );
+    }
+
+    const projectSrcDir = path.join(cwd, src);
+
+    const projectSources = findFiles(projectSrcDir, ".cpp");
+
+    if (projectSources.length === 0) {
+        throw new Error("No .cpp files found to compile.");
+    }
+
+    const rel = (file) => path.relative(cwd, file);
+    const includeArgs = ["-I", rel(getLibDir()), "-I", rel(path.join(getBrideFolder(), "lib", "cpp"))];
+
+    if (projectSources.length > 0) {
+        const output = path.join(dist, "main.wasm");
+        execFileSync("em++", [
             ...projectSources.map(rel),
             rel(archive),
             "-o",

@@ -11,6 +11,15 @@ export function hasEmcc() {
     }
 }
 
+export function hasEmpp() {
+    try {
+        execFileSync("em++", ["--version"], { stdio: "ignore" });
+        return true;
+    } catch {
+        return false;
+    }
+}
+
 export function findFiles(dir, extension) {
     if (!existsSync(dir)) {
         return [];
@@ -36,4 +45,9 @@ export function getLibDir() {
     const installedBride = path.join(cwd, "node_modules", "bride");
     const brideRoot = existsSync(path.join(installedBride, "lib", "c")) ? installedBride : path.join(__dirname, "..");
     return path.join(brideRoot, "lib", "c");
+}
+
+export function getBrideFolder() {
+    const cwd = process.cwd();
+    return path.join(cwd, "node_modules", "bride");
 }

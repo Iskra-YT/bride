@@ -9,8 +9,9 @@ import { WebSocketServer } from "ws";
 
 const command = process.argv[2];
 
+
 if (command === "new") {
-    newProject();
+    newProject(process.argv[3]);
 } else if (command === "build") {
     await buildProject();
 } else if (command === "dev") {
@@ -153,7 +154,7 @@ if (command === "new") {
 Bride CLI
 
 Commands:
-  bride new
+  bride new <language>
   bride build
   bride dev
 `);

@@ -122,7 +122,7 @@ void __ui_impl(BrideArg first, ...) {
     commit(repr_html_tag(create_fragment_tag(children.data, attr.data)));
 }
 
-void __change_impl(char* query, BrideArg first, ...) {
+void __change_impl(const char* query, BrideArg first, ...) {
     HtmlChildren children;
     children_init(&children);
 
@@ -160,7 +160,7 @@ BrideArg __fragment_impl(BrideArg first, ...) {
     return result;
 }
 
-BrideArg attr(char* name, char* value) {
+BrideArg attr(const char* name, const char* value) {
     BrideArg result;
 
     result.type = BRIDE_ATTR;
@@ -201,7 +201,7 @@ char* to_event_name(const char* name) {
     return result;
 }
 
-BrideArg action(char* action, void (*fn)(void)) {
+BrideArg action(const char* action, void (*fn)(void)) {
     BrideArg result;
 
     result.type = BRIDE_ATTR;
@@ -238,8 +238,16 @@ BrideArg on_input(void (*fn)(void)) {
     return action("input", fn);
 }
 
-BrideArg id(char* name) {
+BrideArg id(const char* name) {
     return attr("id", name);
+}
+
+BrideArg class_(const char* name) {
+    return attr("class", name);
+}
+
+BrideArg class(const char* name) {
+    return class_(name);
 }
 
 BrideArg __button_impl(BrideArg first, ...) {

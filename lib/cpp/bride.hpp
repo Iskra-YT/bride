@@ -1,8 +1,6 @@
-#ifndef BRIDE_CPP_H
-#define BRIDE_CPP_H
+#ifndef BRIDE_CPP_HPP
+#define BRIDE_CPP_HPP
 
-namespace bride {
-    #include "../c/bride.h"
-}
+#include "./bride/bhlm.hpp"
 
-#endif // BRIDE_CPP_H
+#endif // BRIDE_CPP_HPP

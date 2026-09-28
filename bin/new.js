@@ -4,8 +4,8 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-export function newProject() {
-    const template = path.join(__dirname, "..", "template");
+export function newProject(language = "c") {
+    const template = path.join(__dirname, "..", "template", language);
     const target = process.cwd();
 
     fs.cpSync(template, target, {

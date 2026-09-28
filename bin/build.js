@@ -2,7 +2,7 @@ import { cp } from "node:fs/promises";
 import { readFileSync, existsSync, mkdirSync } from "node:fs";
 import path from "node:path";
 
-import { compileDotA, compileC } from "./compile.js";
+import { compileDotA, compileC, compileCpp } from "./compile.js";
 
 export async function buildProject() {
     const cwd = process.cwd();
@@ -32,7 +32,7 @@ export async function buildProject() {
     } else if (projectLanguage === "zig") {
         // TODO: Create Zig Language Compiler
     } else if (projectLanguage === "cpp") {
-        // TODO: Create C++ Language Compiler
+        await compileCpp(src, archive);
     }
 
 
