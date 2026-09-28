@@ -30,3 +30,10 @@ export function findFiles(dir, extension) {
 
     return files;
 }
+
+export function getLibDir() {
+    const cwd = process.cwd();
+    const installedBride = path.join(cwd, "node_modules", "bride");
+    const brideRoot = existsSync(path.join(installedBride, "lib", "c")) ? installedBride : path.join(__dirname, "..");
+    return path.join(brideRoot, "lib", "c");
+}

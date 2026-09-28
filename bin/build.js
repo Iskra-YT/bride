@@ -1,14 +1,14 @@
-import { execFileSync } from "node:child_process";
-import { cp, rm } from "node:fs/promises";
+import { cp } from "node:fs/promises";
 import { readFileSync, existsSync, mkdirSync } from "node:fs";
 import path from "node:path";
-import { fileURLToPath } from "node:url";
-import { hasEmcc, findFiles } from "./utils.js";
 
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
+import { compileDotA, compileC } from "./compile.js";
 
 export async function buildProject() {
     const cwd = process.cwd();
+
+    const dist = path.join(cwd, "dist");
+    mkdirSync(dist, { recursive: true });
 
     console.log("Building Bride project...");
 
@@ -22,81 +22,18 @@ export async function buildProject() {
         throw new Error("Project language is not specified in package.json.");
     }
 
-    if (projectLanguage !== "c") {
-        throw new Error(
-            `Project language "${projectLanguage}" is not supported.`,
-        );
+    const archive = compileDotA();
+    if (projectLanguage === "c") {
+        await compileC(src, archive);
+    } else if (projectLanguage === "c3") {
+        // TODO: Create C3 Language Compiler
+    } else if (projectLanguage === "rust") {
+        // TODO: Crate Rust Language Compiler
     }
 
-    if (!hasEmcc()) {
-        throw new Error(
-            "Emscripten (emcc) is not installed. Please install it to build the project.",
-        );
-    }
 
     const installedBride = path.join(cwd, "node_modules", "bride");
-
     const brideRoot = existsSync(path.join(installedBride, "lib", "c")) ? installedBride : path.join(__dirname, "..");
-
-    const libDir = path.join(brideRoot, "lib", "c");
-    const projectSrcDir = path.join(cwd, src);
-
-    const projectSources = findFiles(projectSrcDir, ".c");
-    const librarySources = findFiles(libDir, ".c");
-    const allSources = [...projectSources, ...librarySources];
-
-    if (allSources.length === 0) {
-        throw new Error("No .c files found to compile.");
-    }
-
-    const dist = path.join(cwd, "dist");
-
-    mkdirSync(dist, { recursive: true });
-
-    const rel = (file) => path.relative(cwd, file);
-    const includeArgs = ["-I", rel(libDir)];
-
-    const libBuildDir = path.join(dist, "lib");
-
-    mkdirSync(libBuildDir, { recursive: true });
-
-    const objects = librarySources.map((source) => {
-        const object = path.join(libBuildDir, `${path.parse(source).name}.o`);
-
-        execFileSync("emcc", [
-            "-c",
-            rel(source),
-            "-o",
-            rel(object),
-            ...includeArgs,
-        ]);
-
-        return object;
-    });
-
-    const archive = path.join(libBuildDir, "libbride.a");
-
-    execFileSync("emar", ["rcs", rel(archive), ...objects.map(rel)]);
-
-    console.log(`Built ${rel(archive)}`);
-
-    if (projectSources.length > 0) {
-        const output = path.join(dist, "main.wasm");
-
-        execFileSync("emcc", [
-            ...projectSources.map(rel),
-            rel(archive),
-            "-o",
-            rel(output),
-            ...includeArgs,
-            "-s",
-            "WASM=1",
-        ]);
-
-        console.log(`Built ${rel(output)}`);
-        await rm("dist/lib", { recursive: true, force: true });
-    }
-
     await copyData(dist, cwd, brideRoot);
 }
 
@@ -132,5 +69,10 @@ async function copyData(dist, cwd, brideRoot) {
 
     if (existsSync(mainJs)) {
         await cp(mainJs, path.join(dist, "main.js"));
+    }
+
+    const cssFiles = path.join(cwd, "css");
+    if (existsSync(cssFiles)) {
+        await cp(cssFiles, path.join(dist, "css"), { recursive: true });
     }
 }
