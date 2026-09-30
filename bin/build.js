@@ -1,12 +1,13 @@
-import { cp } from "node:fs/promises";
-import { readFileSync, existsSync, mkdirSync } from "node:fs";
+import { cp, mkdir } from "node:fs/promises";
+import { readFileSync, existsSync, mkdirSync, write } from "node:fs";
 import path from "node:path";
+import { writeFile } from "node:fs/promises";
 
 import { compileDotA, compileC, compileCpp } from "./compile.js";
 
-export async function buildProject() {
-    const cwd = process.cwd();
+const cwd = process.cwd();
 
+export async function buildProject() {
     const dist = path.join(cwd, "dist");
     mkdirSync(dist, { recursive: true });
 
@@ -45,6 +46,9 @@ async function copyData(dist, cwd, brideRoot) {
     const runtime = path.join(brideRoot, "runtime");
     const wasi = path.join(cwd, "node_modules", "@bjorn3", "browser_wasi_shim");
 
+    const licenseDir = path.join(dist, "license");
+    await mkdir(licenseDir, { recursive: true });
+
     await cp(runtime, dist, { recursive: true });
 
     await cp(path.join(wasi, "dist"), path.join(dist, "wasi"), {
@@ -53,14 +57,25 @@ async function copyData(dist, cwd, brideRoot) {
 
     await cp(
         path.join(wasi, "LICENSE-MIT"),
-        path.join(dist, "wasi", "LICENCE-MIT"),
-        { recursive: true },
+        path.join(licenseDir, "WASI-MIT"),
     );
 
     await cp(
         path.join(wasi, "LICENSE-APACHE"),
-        path.join(dist, "wasi", "LICENCE-APACHE"),
-        { recursive: true },
+        path.join(licenseDir, "WASI-APACHE"),
+    );
+
+    const installedBride = path.join(cwd, "node_modules", "bride");
+
+    await cp(
+        path.join(installedBride, "LICENSE"),
+        path.join(licenseDir, "BRIDE-LICENSE"),
+    );
+
+    await writeFile(
+        path.join(dist, "THIRD-PARTY-LICENSES"),
+        `This distribution contains components from Bride and third-party
+dependencies. See the licenses/ directory for applicable licenses.`
     );
 
     const indexHtml = path.join(cwd, "index.html");

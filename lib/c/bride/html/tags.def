@@ -1,0 +1,6 @@
+BRIDE_TAG(PARAGRAPH, p,       "p",     ELEMENT)
+BRIDE_TAG(TEXT,     text,    NULL,    TEXT)
+BRIDE_TAG(FRAGMENT, fragment, NULL,    FRAGMENT)
+BRIDE_TAG(BUTTON,   button,  "button", ELEMENT)
+BRIDE_TAG(ANCHOR, a, "a", ELEMENT)
+BRIDE_TAG(DIV, div, "div", ELEMENT)

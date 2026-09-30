@@ -7,8 +7,10 @@ import { rm } from "node:fs/promises";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
+const cwd = process.cwd();
+const rel = (file) => path.relative(cwd, file);
+
 export function compileDotA() {
-    const cwd = process.cwd();
     const dist = path.join(cwd, "dist");
 
     const libBuildDir = path.join(dist, "lib");
@@ -17,7 +19,6 @@ export function compileDotA() {
     const libDir = getLibDir();
     const librarySources = findFiles(libDir, ".c");
 
-    const rel = (file) => path.relative(cwd, file);
     const includeArgs = ["-I", rel(getLibDir())];
 
     const objects = librarySources.map((source) => {
@@ -42,7 +43,6 @@ export function compileDotA() {
 }
 
 export async function compileC(src, archive) {
-    const cwd = process.cwd();
     const dist = path.join(cwd, "dist");
     if (!hasEmcc()) {
         throw new Error(
@@ -58,7 +58,6 @@ export async function compileC(src, archive) {
         throw new Error("No .c files found to compile.");
     }
 
-    const rel = (file) => path.relative(cwd, file);
     const includeArgs = ["-I", rel(getLibDir())];
 
     if (projectSources.length > 0) {
@@ -79,7 +78,6 @@ export async function compileC(src, archive) {
 }
 
 export async function compileCpp(src, archive) {
-    const cwd = process.cwd();
     const dist = path.join(cwd, "dist");
     if (!hasEmpp()) {
         throw new Error(
@@ -95,7 +93,6 @@ export async function compileCpp(src, archive) {
         throw new Error("No .cpp files found to compile.");
     }
 
-    const rel = (file) => path.relative(cwd, file);
     const includeArgs = ["-I", rel(getLibDir()), "-I", rel(path.join(getBrideFolder(), "lib", "cpp"))];
 
     if (projectSources.length > 0) {
