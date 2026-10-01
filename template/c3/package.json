@@ -1,0 +1,9 @@
+{
+  "name": "bride-app",
+  "version": "0.1.0",
+  "language": "c3",
+  "private": true,
+  "dependencies": {
+    "bride": "^1.0.0"
+  }
+}

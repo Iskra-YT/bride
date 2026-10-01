@@ -20,6 +20,15 @@ export function hasEmpp() {
     }
 }
 
+export function hasC3c() {
+    try {
+        execFileSync("c3c", ["--version"], { stdio: "ignore" });
+        return true;
+    } catch {
+        return false;
+    }
+}
+
 export function findFiles(dir, extension) {
     if (!existsSync(dir)) {
         return [];

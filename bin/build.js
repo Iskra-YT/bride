@@ -3,7 +3,7 @@ import { readFileSync, existsSync, mkdirSync, write } from "node:fs";
 import path from "node:path";
 import { writeFile } from "node:fs/promises";
 
-import { compileDotA, compileC, compileCpp } from "./compile.js";
+import { compileDotA, compileC, compileCpp, compileC3 } from "./compile.js";
 
 const cwd = process.cwd();
 
@@ -27,7 +27,7 @@ export async function buildProject() {
     if (projectLanguage === "c") {
         await compileC(src, archive);
     } else if (projectLanguage === "c3") {
-        // TODO: Create C3 Language Compiler
+        await compileC3(src, archive);
     } else if (projectLanguage === "rust") {
         // TODO: Crate Rust Language Compiler
     } else if (projectLanguage === "zig") {

@@ -1,0 +1,16 @@
+{
+  "langrev": "1",
+  "warnings": [ "no-unused" ],
+  "version": "0.1.0",
+  "sources": [ "src/**" ],
+  "build-dir": "dist/lib/",
+  "output": "dist/lib",
+  "targets": {
+    "bride-app": {
+      "type": "object-files",
+      "target": "emscripten"
+    }
+  },
+  "cpu": "generic",
+  "opt": "O0"
+}
