@@ -87,6 +87,7 @@ char* html_buffer_take(HtmlBuffer* buffer) {
 }
 
 static char* repr_element(HtmlTag* tag, const char* html_name);
+static char* repr_void_element(HtmlTag* tag, const char* html_name);
 static char* repr_text(HtmlTag* tag);
 static char* repr_fragment(HtmlTag* tag);
 
@@ -101,6 +102,10 @@ static char* repr_fragment(HtmlTag* tag);
 #define BRIDE_REPR_FRAGMENT(id, name, html_name) \
     static char* repr_##name##_tag(HtmlTag* tag) { \
         return repr_fragment(tag); \
+    }
+#define BRIDE_REPR_VOID(id, name, html_name) \
+    static char* repr_##name##_tag(HtmlTag* tag) { \
+        return repr_void_element(tag, html_name); \
     }
 
 #define BRIDE_TAG(id, name, html_name, kind) BRIDE_REPR_##kind(id, name, html_name)
@@ -187,6 +192,21 @@ static char* repr_element(HtmlTag* tag, const char* html_name) {
     return html_buffer_take(&buffer);
 }
 
+static char* repr_void_element(HtmlTag* tag, const char* html_name) {
+    HtmlBuffer buffer;
+    html_buffer_init(&buffer);
+
+    if (!html_buffer_append_char(&buffer, '<') ||
+        !html_buffer_append(&buffer, html_name) ||
+        !repr_html_attributes(tag, &buffer) ||
+        !html_buffer_append_char(&buffer, '>')) {
+        html_buffer_free(&buffer);
+        return NULL;
+    }
+
+    return html_buffer_take(&buffer);
+}
+
 static char* repr_fragment(HtmlTag* tag) {
     HtmlBuffer buffer;
     html_buffer_init(&buffer);
@@ -227,6 +247,7 @@ static char* repr_text(HtmlTag* tag) {
         return create_html_tag(HTML_TAG_##id, attributes, childrens); \
     }
 #define BRIDE_CREATE_FRAGMENT(id, name) BRIDE_CREATE_ELEMENT(id, name)
+#define BRIDE_CREATE_VOID(id, name) BRIDE_CREATE_ELEMENT(id, name)
 
 #define BRIDE_TAG(id, name, html_name, kind) BRIDE_CREATE_##kind(id, name)
 #include "./tags.def"

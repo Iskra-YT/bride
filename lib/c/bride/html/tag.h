@@ -48,6 +48,7 @@ void free_html_tag(HtmlTag* tag);
 #define BRIDE_CREATE_ELEMENT(id, name) \
     HtmlTag* create_##name##_tag(HtmlTag** childrens, HtmlAttribute** attributes);
 #define BRIDE_CREATE_FRAGMENT(id, name) BRIDE_CREATE_ELEMENT(id, name)
+#define BRIDE_CREATE_VOID(id, name) BRIDE_CREATE_ELEMENT(id, name)
 
 #define BRIDE_TAG(id, name, html_name, kind) BRIDE_CREATE_##kind(id, name)
 #include "./tags.def"
@@ -56,6 +57,7 @@ void free_html_tag(HtmlTag* tag);
 #undef BRIDE_CREATE_TEXT
 #undef BRIDE_CREATE_ELEMENT
 #undef BRIDE_CREATE_FRAGMENT
+#undef BRIDE_CREATE_VOID
 
 HtmlTag* create_text_tag(const char* text);
 
