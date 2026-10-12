@@ -6,29 +6,61 @@ Bride is the runtime bridge between WebAssembly and the Web.
 
 ## Supported Languages
 
-| Language | Supported |
-|----------|-----------|
-| Rust     | No        |
-| C        | Yes       |
-| C++      | Yes       |
-| Rust     | No        |
-| C3       | Yes       |
-| Zig      | No        |
+| Language | Supported | Documentation            |
+|----------|-----------|--------------------------|
+| C        | Yes       | [docs/c.md](docs/c.md)   |
+| C++      | Yes       | [docs/cpp.md](docs/cpp.md) |
+| C3       | Yes       | [docs/c3.md](docs/c3.md) |
+| Rust     | No        | —                        |
+| Zig      | No        | —                        |
 
-If you want to add language not listed above, please submit a pull request or create an issue.
+A language is **supported only if** all three of the following are true:
+
+1. **It has basic documentation** — a guide for it lives in `docs/`.
+2. **It has a ported library** — bindings exist under `lib/<language>/`.
+3. **It has an active compiler** — a working toolchain integration exists in the CLI.
+
+If any of these is missing, the language is considered *in progress* or
+*unsupported*. See [Adding a language](docs/adding-a-language.md) for the full
+criteria and how to port Bride to a new language.
+
+If you want to add a language not listed above, please submit a pull request or
+create an issue.
+
+## Documentation
+
+Full documentation lives in [`docs/`](docs/README.md):
+
+- [Getting started](docs/getting-started.md)
+- [API reference](docs/api-reference.md)
+- Language guides: [C](docs/c.md), [C++](docs/cpp.md), [C3](docs/c3.md)
+- [Adding a language](docs/adding-a-language.md)
 
 ## How to use
 
+Create a project and build it with the Bride CLI:
+
+```sh
+mkdir my-app && cd my-app
+npm install bride
+npx bride new c       # c | cpp | c3
+npx bride build       # output goes to dist/
+npx bride dev         # serve at http://localhost:9876 with live reload
+```
+
+At runtime, load the compiled module from JavaScript:
+
 ```js
-import { Bride } from "bride";
+import { Bride } from "./bride.js";
 
 await Bride.start({
-    wasm: "./build/app.wasm",
+    wasm: "./main.wasm",
     root: "#app"
 });
 ```
 
-WASM will be loaded and executed, and the HTML element with the id `app` will be used as the root for the application.
+The WASM module is loaded and executed, and the HTML element matching `root`
+(default `#app`) becomes the application root.
 
 ## Tags & fields
 
