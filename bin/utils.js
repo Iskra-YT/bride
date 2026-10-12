@@ -1,6 +1,9 @@
 import { execFileSync } from "node:child_process";
 import { existsSync, readdirSync, statSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import path from "node:path";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export function hasEmcc() {
     try {
@@ -49,11 +52,18 @@ export function findFiles(dir, extension) {
     return files;
 }
 
-export function getLibDir() {
+export function getBrideRoot() {
     const cwd = process.cwd();
     const installedBride = path.join(cwd, "node_modules", "bride");
-    const brideRoot = existsSync(path.join(installedBride, "lib", "c")) ? installedBride : path.join(__dirname, "..");
-    return path.join(brideRoot, "lib", "c");
+    return existsSync(path.join(installedBride, "lib", "c")) ? installedBride : path.join(__dirname, "..");
+}
+
+export function getLibDir() {
+    return path.join(getBrideRoot(), "lib", "c");
+}
+
+export function getC3LibDir() {
+    return path.join(getBrideRoot(), "lib", "c3");
 }
 
 export function getBrideFolder() {

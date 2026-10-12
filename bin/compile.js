@@ -5,11 +5,12 @@ import {
     getLibDir,
     hasEmpp,
     getBrideFolder,
+    getC3LibDir,
 } from "./utils.js";
 import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
 import path from "node:path";
-import { mkdirSync, writeFileSync } from "node:fs";
+import { mkdirSync, writeFileSync, existsSync } from "node:fs";
 import { rm } from "node:fs/promises";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -125,10 +126,10 @@ export async function compileCpp(src, archive) {
 }
 
 const C3_ENTRY_SOURCE = `
-extern int main(int argc, char** argv);
+extern int bride_c3_main(int argc, char** argv) __asm__("main");
 
 __attribute__((weak)) int __main_argc_argv(int argc, char** argv) {
-    return main(argc, argv);
+    return bride_c3_main(argc, argv);
 }
 `;
 
@@ -148,7 +149,13 @@ export async function compileC3(src, archive) {
 
     await rm(path.join(dist, "lib", "obj"), { recursive: true, force: true });
 
-    execFileSync("c3c", ["build"], {
+    const bindings = getC3LibDir();
+
+    if (!existsSync(bindings)) {
+        throw new Error(`Bride C3 bindings not found at ${rel(bindings)}.`);
+    }
+
+    execFileSync("c3c", ["build", "--sources", rel(bindings)], {
         cwd: cwd,
         stdio: "inherit",
     });

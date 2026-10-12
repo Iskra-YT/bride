@@ -9,7 +9,6 @@ import { WebSocketServer } from "ws";
 
 const command = process.argv[2];
 
-
 if (command === "new") {
     newProject(process.argv[3]);
 } else if (command === "build") {
@@ -141,7 +140,11 @@ if (command === "new") {
                 continue;
             }
 
-            if (filename.endsWith(".c") || filename.endsWith(".h")) {
+            if (
+                filename.endsWith(".c") ||
+                filename.endsWith(".h") ||
+                filename.endsWith(".c3")
+            ) {
                 console.log(`Changed: ${filename}`);
                 rebuild();
             }

@@ -1,9 +1,12 @@
 import { cp, mkdir } from "node:fs/promises";
 import { readFileSync, existsSync, mkdirSync, write } from "node:fs";
+import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { writeFile } from "node:fs/promises";
 
 import { compileDotA, compileC, compileCpp, compileC3 } from "./compile.js";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const cwd = process.cwd();
 
