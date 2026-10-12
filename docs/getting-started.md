@@ -61,7 +61,7 @@ The `language` field in `package.json` tells the CLI which toolchain to use:
   "name": "bride-app",
   "language": "c",
   "dependencies": {
-    "bride": "^1.0.0"
+    "bride-cli": "^1.0.0"
   }
 }
 ```

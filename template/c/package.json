@@ -4,6 +4,6 @@
   "language": "c",
   "private": true,
   "dependencies": {
-    "bride": "^1.0.0"
+    "bride-cli": "^1.0.0"
   }
 }

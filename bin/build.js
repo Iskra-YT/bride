@@ -40,7 +40,7 @@ export async function buildProject() {
     }
 
 
-    const installedBride = path.join(cwd, "node_modules", "bride");
+    const installedBride = path.join(cwd, "node_modules", "bride-cli");
     const brideRoot = existsSync(path.join(installedBride, "lib", "c")) ? installedBride : path.join(__dirname, "..");
     await copyData(dist, cwd, brideRoot);
 }
@@ -68,10 +68,8 @@ async function copyData(dist, cwd, brideRoot) {
         path.join(licenseDir, "WASI-APACHE"),
     );
 
-    const installedBride = path.join(cwd, "node_modules", "bride");
-
     await cp(
-        path.join(installedBride, "LICENSE"),
+        path.join(brideRoot, "LICENSE"),
         path.join(licenseDir, "BRIDE-LICENSE"),
     );
 

@@ -54,7 +54,7 @@ export function findFiles(dir, extension) {
 
 export function getBrideRoot() {
     const cwd = process.cwd();
-    const installedBride = path.join(cwd, "node_modules", "bride");
+    const installedBride = path.join(cwd, "node_modules", "bride-cli");
     return existsSync(path.join(installedBride, "lib", "c")) ? installedBride : path.join(__dirname, "..");
 }
 
@@ -68,5 +68,5 @@ export function getC3LibDir() {
 
 export function getBrideFolder() {
     const cwd = process.cwd();
-    return path.join(cwd, "node_modules", "bride");
+    return path.join(cwd, "node_modules", "bride-cli");
 }
