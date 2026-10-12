@@ -9,7 +9,7 @@ namespacing:
 |----------|--------|-------------|
 | C        | `#include "bride.h"` | Unqualified (`p`, `text`, `ui`, ...) |
 | C++      | `#include "bride.hpp"` | `bride::` prefix (`bride::p`, `bride::ui`, ...) |
-| C3       | `import bride::c3;` | `c3::` prefix (`c3::p`, `c3::ui`, ...) |
+| C3       | `import bride;` | `bride::` prefix (`bride::p`, `bride::ui`, ...) |
 
 ## Rendering
 
@@ -19,7 +19,7 @@ namespacing:
 | `change(query, ...)` | Renders the given tree and replaces the `innerHTML` of the first element matching the CSS `query`. |
 
 In C and C++ these are macros (`ui(...)`, `change(query, ...)`); in C3 they are
-macros as well (`c3::ui(...)`, `c3::change(query, ...)`).
+macros as well (`bride::ui(...)`, `bride::change(query, ...)`).
 
 ```c
 ui(

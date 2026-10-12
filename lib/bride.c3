@@ -1,4 +1,4 @@
-module bride::c3;
+module bride;
 
 import libc;
 import std::core::string;

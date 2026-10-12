@@ -63,7 +63,7 @@ export function getLibDir() {
 }
 
 export function getC3LibDir() {
-    return path.join(getBrideRoot(), "lib", "c3");
+    return path.join(getBrideRoot(), "lib");
 }
 
 export function getBrideFolder() {
