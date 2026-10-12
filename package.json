@@ -1,6 +1,6 @@
 {
   "name": "bride-cli",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Bride is the runtime bridge between WebAssembly and the Web.",
   "language": "c",
   "type": "module",
