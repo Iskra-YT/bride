@@ -42,7 +42,7 @@ Create a project and build it with the Bride CLI:
 
 ```sh
 mkdir my-app && cd my-app
-npm install bride
+npm install bride-cli
 npx bride new c       # c | cpp | c3
 npx bride build       # output goes to dist/
 npx bride dev         # serve at http://localhost:9876 with live reload

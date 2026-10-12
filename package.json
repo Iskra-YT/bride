@@ -1,5 +1,5 @@
 {
-  "name": "bride",
+  "name": "bride-cli",
   "version": "1.0.0",
   "description": "Bride is the runtime bridge between WebAssembly and the Web.",
   "language": "c",
