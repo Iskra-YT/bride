@@ -2,7 +2,7 @@
 #include "./bhlm.h"
 #include "./children.h"
 #include "./js.h"
-#include "./dispach.h"
+#include "./dispatch.h"
 #include "./attrs.h"
 
 #include <stdarg.h>

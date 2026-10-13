@@ -1,4 +1,4 @@
-#include "./dispach.h"
+#include "./dispatch.h"
 #include "./map.h"
 
 #include <emscripten/emscripten.h>
