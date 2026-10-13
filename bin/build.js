@@ -1,5 +1,5 @@
 import { cp, mkdir } from "node:fs/promises";
-import { readFileSync, existsSync, mkdirSync, write } from "node:fs";
+import { readFileSync, existsSync, mkdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { writeFile } from "node:fs/promises";

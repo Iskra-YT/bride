@@ -4,6 +4,10 @@ import { defineConfig } from "eslint/config";
 
 export default defineConfig([
     {
+        ignores: ["dist/**", "**/dist/**"],
+    },
+
+    {
         files: ["**/*.{js,mjs,cjs}"],
 
         languageOptions: {

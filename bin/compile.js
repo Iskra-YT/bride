@@ -7,13 +7,10 @@ import {
     getBrideFolder,
     getC3LibDir,
 } from "./utils.js";
-import { fileURLToPath } from "node:url";
 import { execFileSync } from "node:child_process";
 import path from "node:path";
 import { mkdirSync, writeFileSync, existsSync } from "node:fs";
 import { rm } from "node:fs/promises";
-
-const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const cwd = process.cwd();
 const rel = (file) => path.relative(cwd, file);
