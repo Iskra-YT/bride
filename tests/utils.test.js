@@ -5,9 +5,15 @@ import {
     getContentType,
     isSourceFile,
     parseDevOptions,
+    getBrideFolder,
+    getBrideRoot,
     DEFAULT_DEV_PORT,
     DEFAULT_DEV_HOST,
 } from "../bin/utils.js";
+
+test("getBrideFolder matches getBrideRoot so C++ include paths stay valid", () => {
+    assert.equal(getBrideFolder(), getBrideRoot());
+});
 
 test("isSourceFile accepts every supported source extension", () => {
     for (const extension of [".c", ".h", ".cpp", ".hpp", ".c3"]) {

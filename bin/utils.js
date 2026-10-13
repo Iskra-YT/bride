@@ -67,8 +67,7 @@ export function getC3LibDir() {
 }
 
 export function getBrideFolder() {
-    const cwd = process.cwd();
-    return path.join(cwd, "node_modules", "bride-cli");
+    return getBrideRoot();
 }
 
 // File extensions the dev server watches for changes.
