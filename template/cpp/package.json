@@ -4,6 +4,6 @@
   "language": "cpp",
   "private": true,
   "dependencies": {
-    "bride-cli": "^1.0.0"
+    "bride-cli": "^1.0.2"
   }
 }
