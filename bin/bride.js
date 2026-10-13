@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 
-import { newProject } from "./new.js";
+import { newProject, listTemplates } from "./new.js";
 import { buildProject } from "./build.js";
+import { getContentType, isSourceFile, parseDevOptions } from "./utils.js";
 import path from "node:path";
 import { createServer } from "node:http";
 import { readFile, watch } from "node:fs/promises";
@@ -9,11 +10,9 @@ import { WebSocketServer } from "ws";
 
 const command = process.argv[2];
 
-if (command === "new") {
-    newProject(process.argv[3]);
-} else if (command === "build") {
-    await buildProject();
-} else if (command === "dev") {
+async function runDev(args) {
+    const options = parseDevOptions(args);
+
     console.log("Starting Bride development server...");
 
     await buildProject();
@@ -60,18 +59,8 @@ if (command === "new") {
                 data = await readFile(filePath);
             }
 
-            const contentTypes = {
-                ".html": "text/html",
-                ".js": "text/javascript",
-                ".wasm": "application/wasm",
-                ".css": "text/css",
-                ".json": "application/json",
-                ".svg": "image/svg+xml",
-                ".png": "image/png",
-            };
-
             res.writeHead(200, {
-                "Content-Type": contentTypes[ext] || "application/octet-stream",
+                "Content-Type": getContentType(ext),
             });
 
             res.end(data);
@@ -89,8 +78,15 @@ if (command === "new") {
         console.log("Browser connected.");
     });
 
-    server.listen(9876, () => {
-        console.log("Bride dev server running at http://localhost:9876");
+    server.on("error", (error) => {
+        console.error(error.message);
+        process.exit(1);
+    });
+
+    server.listen(options.port, options.host, () => {
+        console.log(
+            `Bride dev server running at http://${options.host}:${options.port}`,
+        );
         console.log("Watching for changes...");
     });
 
@@ -136,15 +132,7 @@ if (command === "new") {
         });
 
         for await (const { filename } of watcher) {
-            if (!filename) {
-                continue;
-            }
-
-            if (
-                filename.endsWith(".c") ||
-                filename.endsWith(".h") ||
-                filename.endsWith(".c3")
-            ) {
+            if (isSourceFile(filename)) {
                 console.log(`Changed: ${filename}`);
                 rebuild();
             }
@@ -152,13 +140,33 @@ if (command === "new") {
     };
 
     watchDirectory(path.join(cwd, "src"));
-} else {
+}
+
+function printUsage() {
     console.log(`
 Bride CLI
 
 Commands:
   bride new <language>
   bride build
-  bride dev
+  bride dev [--port <port>] [--host <host>]
+
+Languages:
+  ${listTemplates().join(", ")}
 `);
+}
+
+try {
+    if (command === "new") {
+        newProject(process.argv[3]);
+    } else if (command === "build") {
+        await buildProject();
+    } else if (command === "dev") {
+        await runDev(process.argv.slice(3));
+    } else {
+        printUsage();
+    }
+} catch (error) {
+    console.error(error.message);
+    process.exitCode = 1;
 }

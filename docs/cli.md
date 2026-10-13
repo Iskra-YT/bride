@@ -14,7 +14,7 @@ bride <command> [arguments]
 |---------|---------|
 | [`bride new`](#bride-new) | Scaffold a new project from a template. |
 | [`bride build`](#bride-build) | Compile the project into `dist/`. |
-| [`bride dev`](#bride-dev) | Build, serve, and live-reload while you edit. |
+| [`bride dev`](#bride-dev) | Build, serve, and live-reload while you edit (`--port`, `--host`). |
 
 Running `bride` with no command (or an unknown command) prints the usage summary
 and exits.
@@ -45,8 +45,9 @@ cd my-app
 npx bride new c
 ```
 
-If the language has no template directory, the command fails with a file-system
-error. When in doubt, scaffold without a language to get C.
+If `language` is not one of the available templates, the command prints a clear
+error listing the available languages and exits with a non-zero status. When in
+doubt, scaffold without a language to get C.
 
 ## `bride build`
 
@@ -122,20 +123,31 @@ bride dev
 
 Runs `bride build`, then starts a development server:
 
-- Serves `dist/` at **http://localhost:9876**. `/` maps to `dist/index.html`.
-- Serves `.html`, `.js`, `.wasm`, `.css`, `.json`, `.svg`, and `.png` with the
-  correct `Content-Type`; anything else is sent as
+- Serves `dist/` at `http://<host>:<port>` (defaults: `localhost:9876`). `/`
+  maps to `dist/index.html`.
+- Serves `.html`, `.js`, `.mjs`, `.wasm`, `.css`, `.json`, `.map`,
+  `.webmanifest`, `.txt`, `.svg`, `.png`, `.jpg`, `.jpeg`, `.gif`, `.webp`,
+  `.avif`, `.ico`, `.woff`, `.woff2`, `.ttf`, `.otf`, `.mp4`, `.webm`, `.mp3`,
+  and `.ogg` with the correct `Content-Type`; anything else is sent as
   `application/octet-stream`.
 - Injects a small live-reload `<script>` before `</body>` of every HTML
   response, connected to the server over a WebSocket.
-- Watches `src/` **recursively**. When a `.c`, `.h`, or `.c3` file changes, it
-  rebuilds and tells every connected browser to reload.
+- Watches `src/` **recursively**. When a `.c`, `.h`, `.cpp`, `.hpp`, or `.c3`
+  file changes, it rebuilds and tells every connected browser to reload.
 
 Rebuilds are serialized: if a change arrives while a build is running, one more
 build is queued and run afterwards. A failed rebuild is logged and does not stop
 the server.
 
-There is no CLI flag to change the port; it is always `9876`.
+### Options
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `--port <port>` | `9876` | Port to listen on (1–65535). |
+| `--host <host>` | `localhost` | Interface to bind to; use `0.0.0.0` to expose the server on the network. |
+
+Both spellings are accepted: `--port 3000` and `--port=3000`. An invalid port or
+an unknown option aborts with an error before anything is built.
 
 ---
 
