@@ -32,7 +32,10 @@ create an issue.
 Full documentation lives in [`docs/`](docs/README.md):
 
 - [Getting started](docs/getting-started.md)
+- [CLI reference](docs/cli.md)
 - [API reference](docs/api-reference.md)
+- [Architecture](docs/architecture.md)
+- [Tutorials](docs/tutorials.md)
 - Language guides: [C](docs/c.md), [C++](docs/cpp.md), [C3](docs/c3.md)
 - [Adding a language](docs/adding-a-language.md)
 
