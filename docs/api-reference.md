@@ -24,9 +24,10 @@ each language.
 |----------|-------------|
 | `ui(...)` | Renders the given children and commits them to the root element set in `Bride.start({ root })`. |
 | `change(query, ...)` | Renders the given children and replaces the `innerHTML` of the first element matching the CSS `query`. |
+| `append(query, ...)` | Renders the given children and **appends** them to the `innerHTML` of the first element matching the CSS `query`. |
 
-Both take a list of children (plus any fields, though fields are pointless at the
-top level). In C, C++, and C3 `ui` and `change` are macros.
+All three take a list of children (plus any fields, though fields are pointless
+at the top level). In C, C++, and C3 `ui`, `change`, and `append` are macros.
 
 ```c
 ui(
@@ -39,7 +40,14 @@ change("#counter", textf("Clicks: %d", count));
 
 `ui` replaces the entire root element's `innerHTML`. `change` targets a specific
 element by selector, which lets you update a fragment of the page without
-re-rendering everything. If the selector matches nothing, `change` is a no-op.
+re-rendering everything. `append` works like `change`, but adds the rendered
+children to the element instead of replacing its contents — handy for growing
+lists. If the selector matches nothing, `change` and `append` are no-ops.
+
+```c
+// Adds one <li> to the list instead of replacing it.
+append("#list", li(textf("Item %d", ++count)));
+```
 
 ## Text
 
@@ -294,6 +302,69 @@ calls `Bride.dispatch(n)`.
 > **Handlers do not receive the DOM event.** The runtime provides no way to read
 > the event or the current DOM values. Keep state in the module and re-render.
 
+## Styling
+
+Bride renders plain HTML, so apps are styled with ordinary CSS — there is no
+styling DSL. Two field helpers and one startup function cover the common cases.
+
+| Helper | Description |
+|--------|-------------|
+| `style("...")` | Sets the inline `style` attribute of an element. |
+| `class("...")` / `class_("...")` | Sets the `class` attribute. Use `class` in C and `class_` in C++ and C3. |
+| `style_file("...")` | Appends a `<link rel="stylesheet">` for the given path to `<head>`. |
+
+Inline styles and class names are ordinary fields, accepted by every tag:
+
+```c
+ui(
+    div_(
+        class("card"),
+        style("padding: 1rem; border-radius: 8px;"),
+        h1(text("Hello")),
+        p(text("Styled with plain CSS."))
+    )
+);
+```
+
+For real stylesheets, call `style_file` once at startup. The path is relative
+to the generated `index.html`, so keep your CSS in a `css/` folder at the
+project root — `bride build` copies it into `dist/css/` untouched:
+
+```
+my-app/
+└── css/
+    └── style.css       # copied to dist/css/ by the build
+```
+
+```c
+#include "bride.h"
+
+int main(void) {
+    style_file("css/style.css");
+
+    ui(
+        div_(
+            id("app"),
+            class("card"),
+            h1(text("Hello")),
+            p(text("Styled with plain CSS."))
+        )
+    );
+}
+```
+
+```css
+/* css/style.css */
+.card {
+    padding: 1rem;
+    border-radius: 8px;
+    background: #f5f5f5;
+}
+```
+
+> `style_file` appends a `<link>` element to `<head>` on every call, so call it
+> once (for example from `main`) rather than on each render.
+
 ## Routing
 
 Bride ships an optional client-side router. Register a page handler for a path
@@ -380,6 +451,7 @@ keyword workarounds differ.
 | Include / import | `#include "bride.h"` | `#include "bride.hpp"` | `import bride;` |
 | Render to root | `ui(...)` | `bride::ui(...)` | `bride::ui(...)` |
 | Render fragment | `change("#id", ...)` | `bride::change("#id", ...)` | `bride::change("#id", ...)` |
+| Append to fragment | `append("#id", ...)` | `bride::append("#id", ...)` | `bride::append("#id", ...)` |
 | Text | `text` / `textf` | `bride::text` / `bride::textf` | `bride::text` / `bride::textf` |
 | Tags | `p(...)` | `bride::p(...)` | `bride::p(...)` |
 | Class helper | `class(...)` | `bride::class_(...)` | `bride::class_(...)` |
@@ -413,7 +485,7 @@ await Bride.start({
 
 | Method | Description |
 |--------|-------------|
-| `Bride.start(options)` | Instantiates the module, wires the `commit`/`commit_at` imports, calls the WASI initializer, and runs the module's `_start`. Throws if `root` does not match an element or if the module exports no memory. |
+| `Bride.start(options)` | Instantiates the module, wires the `commit`, `commit_at`, and `add_at` imports, calls the WASI initializer, and runs the module's `_start`. Throws if `root` does not match an element or if the module exports no memory. |
 | `Bride.dispatch(number)` | Calls the event handler registered under `number`. Used internally by generated `on*` attributes. |
 | `Bride.navigate(path)` | Client-side navigation: pushes a history entry and renders the matching route. |
 | `Bride.render()` | Re-renders the route matching the current URL. |
@@ -442,12 +514,14 @@ imported functions. You can call them directly to build HTML yourself:
 // Imported from the runtime.
 void commit(const char* html);
 void commit_at(const char* query, const char* html);
+void add_at(const char* query, const char* html);
 ```
 
 | Function | Effect |
 |----------|--------|
 | `commit(html)` | Replaces the entire root element's `innerHTML`. |
 | `commit_at(query, html)` | Replaces the `innerHTML` of the first element matching `query`. |
+| `add_at(query, html)` | Appends to the `innerHTML` of the first element matching `query`. |
 
 Both take NUL-terminated UTF-8 strings; the C wrappers pass `strlen(html)` as the
 length. These are useful when generating dynamic HTML that is easier to build as

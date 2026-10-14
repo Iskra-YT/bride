@@ -119,6 +119,15 @@ export const Bride = {
                     element.innerHTML = html;
                 }
             },
+            add_at: (query_ptr, query_len, html_ptr, html_len) => {
+                const query = wasmString(memory, query_ptr, query_len);
+                const html = wasmString(memory, html_ptr, html_len);
+
+                const element = document.querySelector(query);
+                if (element) {
+                    element.innerHTML += html;
+                }
+            },
             route: (path_ptr, path_len, handler) => {
                 const path = wasmString(memory, path_ptr, path_len);
 

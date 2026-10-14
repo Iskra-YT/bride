@@ -20,7 +20,7 @@ back into your code, and how the build is assembled.
 │         │   your code ──▶ Bride DSL ──▶ HTML string          │      │
 │         │        ▲                                │          │      │
 │         │        │                                ▼          │      │
-│         │   dispatch(n)               commit / commit_at      │      │
+│         │   dispatch(n)         commit / commit_at / add_at  │      │
 │         └────────┬───────────────────────────────┬──────────┘      │
 │                  │ imports (env)                 │ exports         │
 │                  ▼                               ▼                  │
@@ -44,6 +44,7 @@ well-defined contract.
 |--------|--------|-----------|-------------|
 | `env` | `commit` | `(ptr: i32, len: i32) => void` | Bride runtime |
 | `env` | `commit_at` | `(queryPtr: i32, queryLen: i32, htmlPtr: i32, htmlLen: i32) => void` | Bride runtime |
+| `env` | `add_at` | `(queryPtr: i32, queryLen: i32, htmlPtr: i32, htmlLen: i32) => void` | Bride runtime |
 | `env` | `route` | `(pathPtr: i32, pathLen: i32, handler: i32) => void` | Bride runtime |
 | `env` | `navigate` | `(pathPtr: i32, pathLen: i32) => void` | Bride runtime |
 | `wasi_snapshot_preview1` | (many) | — | `@bjorn3/browser_wasi_shim` |
@@ -55,6 +56,10 @@ runtime decodes that byte range as UTF-8 and assigns it to the root element's
 `commit_at` receives two such ranges: a CSS `query` and the `html` to insert.
 It assigns the HTML to the `innerHTML` of the **first** element matching the
 query, and does nothing if there is no match.
+
+`add_at` has the same signature as `commit_at`, but **appends** to the matching
+element's `innerHTML` instead of replacing it. This is what `append(query, ...)`
+uses to grow a fragment in place, for example when adding items to a list.
 
 ### Exports
 
@@ -119,8 +124,9 @@ proceeds in three stages:
 2. **Serialize.** `repr_html_tag` walks the tree with a per-tag dispatch table
    and produces a single HTML string in a growable buffer.
 3. **Commit.** `ui(...)` renders a fragment and calls `commit`; `change(query,
-   ...)` renders a fragment and calls `commit_at`. The rendered string is freed
-   immediately afterwards.
+   ...)` renders a fragment and calls `commit_at`; `append(query, ...)` renders
+   a fragment and calls `add_at`. The rendered string is freed immediately
+   afterwards.
 
 Because the whole tree is rebuilt and serialized on every render, each `ui` or
 `change` call replaces the affected DOM subtree wholesale. There is no diffing.
@@ -165,11 +171,11 @@ Handlers are plain `void (*)(void)` functions with no arguments and no return
 value. They cannot receive the DOM event. The dispatch table is initialized once
 on first use and lives for the lifetime of the module.
 
-> **No DOM reads.** The runtime only provides `commit` and `commit_at`; there is
-> no import that reads values back out of the DOM. Handlers observe an event but
-> cannot, for example, read the current text of an `<input>`. Keep the source of
-> truth in the module's own state and re-render from it. Native form submission
-> still works because the browser handles it.
+> **No DOM reads.** The runtime only provides `commit`, `commit_at`, and
+> `add_at`; there is no import that reads values back out of the DOM. Handlers
+> observe an event but cannot, for example, read the current text of an
+> `<input>`. Keep the source of truth in the module's own state and re-render
+> from it. Native form submission still works because the browser handles it.
 
 ## Routing
 
@@ -241,7 +247,7 @@ small generated entry shim that maps Emscripten's `__main_argc_argv` onto the C3
 | `runtime/bride.js` | The `Bride` object: `start`, `dispatch`, and `navigate`. |
 | `runtime/router.js` | Pure route matching helpers (`normalizePath`, `matchRoute`). |
 | `runtime/wasm.js` | Module loading and string decoding. |
-| `lib/c/bride/js.*` | `commit` / `commit_at` wrappers over the imports. |
+| `lib/c/bride/js.*` | `commit` / `commit_at` / `add_at` wrappers over the imports. |
 | `lib/c/bride/router.*` | `route` / `navigate` helpers over the imports. |
 | `lib/c/bride/dispatch.c` | The dispatch table. |
 | `lib/c/bride/html/` | Tag model, `tags.def`, and the serializer. |

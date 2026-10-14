@@ -16,6 +16,12 @@ const cwd = process.cwd();
 const rel = (file) => path.relative(cwd, file);
 
 export function compileDotA() {
+    if (!hasEmcc()) {
+        throw new Error(
+            "Emscripten (emcc) is not installed. Please install it to build the project.",
+        );
+    }
+
     const dist = path.join(cwd, "dist");
 
     const libBuildDir = path.join(dist, "lib");

@@ -21,4 +21,12 @@ extern void __navigate(const char* path, int len)
     __attribute__((import_module("env")))
     __attribute__((import_name("navigate")));
 
+extern void __add_at(
+    const char* query_ptr,
+    int query_len,
+    const char* html_ptr,
+    int html_len
+) __attribute__((import_module("env")))
+  __attribute__((import_name("add_at")));
+
 #endif

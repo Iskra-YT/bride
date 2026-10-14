@@ -84,6 +84,7 @@ namespace bride {
     // Render helpers
     using ::__ui_impl;
     using ::__change_impl;
+    using ::__append_impl;
 
     // Elements
     using ::__p_impl;
@@ -193,6 +194,9 @@ namespace bride {
     // Templates
     using ::__template_impl;
     using ::__slot_impl;
+
+    // CSS
+    using ::style_file;
 }
 
 #endif // BRIDE_HIGH_LEVEL_MODULE_HPP

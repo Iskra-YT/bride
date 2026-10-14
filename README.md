@@ -36,6 +36,7 @@ Full documentation lives in [`docs/`](docs/README.md):
 - [API reference](docs/api-reference.md)
 - [Architecture](docs/architecture.md)
 - [Tutorials](docs/tutorials.md)
+- [Styling with CSS](docs/api-reference.md#styling)
 - Language guides: [C](docs/c.md), [C++](docs/cpp.md), [C3](docs/c3.md)
 - [Adding a language](docs/adding-a-language.md)
 
@@ -110,6 +111,10 @@ generic `attr(name, value)`.
 
 Boolean helpers: `disabled`, `checked`, `selected`, `required`, `readonly`,
 `multiple`, `autofocus`, `hidden`.
+
+> Bride renders plain HTML, so styling is done with ordinary CSS — see
+> [Styling](docs/api-reference.md#styling) for inline styles, class helpers,
+> and `style_file` stylesheet links.
 
 Event helpers: `on_click`, `on_input`, `on_change`, `on_submit`, `on_focus`,
 `on_blur`, `on_keydown`, `on_keyup`, `on_keypress`, `on_dblclick`,

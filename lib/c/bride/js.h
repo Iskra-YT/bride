@@ -6,5 +6,6 @@
 
 void commit(const char* html);
 void commit_at(const char* query, const char* html);
+void add_at(const char* query, const char* html);
 
 #endif // BRIDE_JS_H

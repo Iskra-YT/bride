@@ -228,6 +228,10 @@ Why `commit_at` and not `change`? `change` takes DSL nodes, while `commit_at`
 takes a raw HTML string — exactly what a loop produces. `commit_at` replaces the
 `innerHTML` of the matched element, so we always render the whole list.
 
+When you only want to *add* to the element — for example appending one item
+without re-rendering the rest — use the low-level `add_at` primitive (or its
+high-level counterpart, `append`) instead.
+
 Because this HTML is built by hand, escaping any interpolated data is entirely up
 to you.
 

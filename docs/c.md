@@ -26,9 +26,9 @@ contain `"language": "c"`.
 #include "bride.h"
 ```
 
-`bride.h` pulls in the imported WASM functions (`commit`, `commit_at`), the
-low-level types (`BrideArg`), and the high-level DSL (`ui`, `change`, `text`,
-`textf`, tag and field helpers).
+`bride.h` pulls in the imported WASM functions (`commit`, `commit_at`,
+`add_at`), the low-level types (`BrideArg`), and the high-level DSL (`ui`,
+`change`, `append`, `text`, `textf`, tag and field helpers).
 
 You do not need to configure include paths manually: `bride build` adds the
 Bride `lib/c` directory to the compiler include path and links the compiled

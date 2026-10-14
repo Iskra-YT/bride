@@ -144,6 +144,9 @@ void __ui_impl(BrideArg first, ...);
 void __change_impl(const char* query, BrideArg first, ...);
 #define change(query, ...) __change_impl(query, __VA_ARGS__ __VA_OPT__(,) END)
 
+void __append_impl(const char* query, BrideArg first, ...);
+#define append(query, ...) __append_impl(query, __VA_ARGS__ __VA_OPT__(,) END)
+
 BrideArg attr(const char* name, const char* value);
 BrideArg action(const char* name, void (*fn)(void));
 
@@ -216,6 +219,9 @@ BrideArg on_scroll(void (*fn)(void));
 BrideArg on_load(void (*fn)(void));
 BrideArg on_contextmenu(void (*fn)(void));
 BrideArg on_wheel(void (*fn)(void));
+
+// CSS
+void style_file(const char* filename);
 
 #ifdef __cplusplus
 } // extern "C"

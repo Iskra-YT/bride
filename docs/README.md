@@ -12,7 +12,8 @@ This `docs/` directory explains how to use Bride in a given language.
 |----------|-------------|
 | [Getting started](getting-started.md) | Install the toolchain, scaffold a project, build, and run it. |
 | [CLI reference](cli.md) | The `bride new`, `bride build`, and `bride dev` commands, requirements, and output. |
-| [API reference](api-reference.md) | The HTML DSL: tags, fields, events, routing, `ui`, `change`, `text`, and `textf`. |
+| [Smoke testing](cli.md#smoke-testing-the-package) | How the packed package is tested end to end before it is published. |
+| [API reference](api-reference.md) | The HTML DSL: tags, fields, events, routing, styling, `ui`, `change`, `text`, and `textf`. |
 | [Architecture](architecture.md) | How the module talks to the browser: rendering, dispatch, the runtime, and the build. |
 | [Tutorials](tutorials.md) | Complete, runnable example applications. |
 | [C](c.md) | How to use Bride in C. |

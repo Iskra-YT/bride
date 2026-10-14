@@ -19,7 +19,8 @@
   ],
   "scripts": {
     "test": "node --test tests/",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "smoke": "node tests/smoke/smoke.mjs"
   },
   "keywords": [
     "wasm",

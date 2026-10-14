@@ -156,6 +156,7 @@ alias TagFactory = fn Tag*(Tag** childrens, Attribute** attributes);
 
 extern fn void commit(char* html);
 extern fn void commit_at(char* query, char* html);
+extern fn void add_at(char* query, char* html);
 
 // Routing
 extern fn void route(char* path, Handler handler);
@@ -349,6 +350,9 @@ extern fn Tag* tag_meter(Tag** childrens, Attribute** attributes) @cname("create
 // Templates
 extern fn Tag* tag_template(Tag** childrens, Attribute** attributes) @cname("create_template_tag");
 extern fn Tag* tag_slot(Tag** childrens, Attribute** attributes) @cname("create_slot_tag");
+
+// CSS
+extern fn void style_file(const char* filename) @cname("style_file");
 
 fn Arg arg_html(Tag* tag) => { .type = BRIDE_HTML, .value = tag };
 
@@ -614,6 +618,17 @@ fn void commit_tree_at(char* query, Tag* tree)
     free_html_tag(tree);
 }
 
+fn void append_tree_at(char* query, Tag* tree)
+{
+    char* html = repr_html_tag(tree);
+    if (html == null) return;
+
+    add_at(query, html);
+
+    libc::free(html);
+    free_html_tag(tree);
+}
+
 macro void ui(Arg... args)
 {
     commit_tree(collect(&tag_fragment, args));
@@ -622,4 +637,8 @@ macro void ui(Arg... args)
 macro void change(char* query, Arg... args)
 {
     commit_tree_at(query, collect(&tag_fragment, args));
+}
+
+macro void append(char* query, Arg... args) {
+	append_tree_at(query, collect((&tag_fragment, args)));
 }

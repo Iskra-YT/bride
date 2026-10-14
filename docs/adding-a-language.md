@@ -35,7 +35,8 @@ Then link it from the documentation index and the main `README.md`.
 Add bindings under `lib/<language>/`. They should expose the same DSL surface as
 the C library:
 
-- `ui(...)` and `change(query, ...)` for committing HTML.
+- `ui(...)`, `change(query, ...)`, and `append(query, ...)` for committing
+  HTML.
 - `text(value)` and `textf(format, ...)` for text nodes.
 - `route(path, page)` and `navigate(path)` for client-side routing.
 - Tag builders for every entry in `lib/c/bride/html/tags.def`.

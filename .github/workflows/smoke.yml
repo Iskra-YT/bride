@@ -1,0 +1,106 @@
+name: Smoke
+
+# Tests the package the way a user consumes it: `npm pack`, install the tarball
+# into an empty directory, `bride new <language>`, `bride build`, and then run
+# the result. See tests/smoke/smoke.mjs.
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    # Weekly, so a broken toolchain release is caught even without a commit.
+    - cron: "0 6 * * 1"
+
+jobs:
+  smoke:
+    name: ${{ matrix.language }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [c, cpp, c3]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      # `bride build` compiles with emcc, em++ and emar. Pin a version (for
+      # example "4.0.7") if you want the action to cache the SDK between runs.
+      - name: Install Emscripten
+        uses: emscripten-core/setup-emsdk@v15
+        with:
+          version: latest
+
+      - name: Check the toolchain
+        run: |
+          emcc --version
+          em++ --version
+
+      - name: Install the C3 compiler
+        if: matrix.language == 'c3'
+        run: |
+          set -euo pipefail
+          c3_dir="$HOME/.local/c3"
+          mkdir -p "$c3_dir"
+          curl -fsSL https://github.com/c3lang/c3c/releases/latest/download/c3-linux-static.tar.gz \
+            | tar -xz -C "$c3_dir"
+          # Some releases unpack into a subdirectory.
+          if [ ! -x "$c3_dir/c3c" ]; then
+            mv "$c3_dir"/*/* "$c3_dir"/
+          fi
+          chmod +x "$c3_dir/c3c"
+          echo "$c3_dir" >> "$GITHUB_PATH"
+          export PATH="$c3_dir:$PATH"
+          c3c --version
+
+      - name: Pack Bride, install it, scaffold and build it
+        run: |
+          node tests/smoke/smoke.mjs --lang ${{ matrix.language }} \
+            --keep --workspace "$RUNNER_TEMP/bride-smoke"
+
+      - name: Upload the built app
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-dist-${{ matrix.language }}
+          path: ${{ runner.temp }}/bride-smoke/app-*/dist
+          if-no-files-found: ignore
+
+  # The same flow in a real browser: this is what catches problems on the
+  # browser side of the runtime (ES modules, streaming WASM compilation, DOM).
+  browser:
+    name: chromium
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Emscripten
+        uses: emscripten-core/setup-emsdk@v15
+        with:
+          version: latest
+
+      - name: Pack, build and run the app in Chromium
+        run: |
+          node tests/smoke/smoke.mjs --lang c --browser \
+            --keep --workspace "$RUNNER_TEMP/bride-smoke"
+
+      - name: Upload the built app
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-dist-chromium
+          path: ${{ runner.temp }}/bride-smoke/app-*/dist
+          if-no-files-found: ignore

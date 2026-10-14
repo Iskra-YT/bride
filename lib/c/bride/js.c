@@ -7,3 +7,7 @@ void commit(const char* html) {
 void commit_at(const char* query, const char* html) {
     __commit_at(query, strlen(query), html, strlen(html));
 }
+
+void add_at(const char* query, const char* html) {
+    __add_at(query, strlen(query), html, strlen(html));
+}

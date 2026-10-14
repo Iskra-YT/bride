@@ -108,6 +108,40 @@ void __change_impl(const char* query, BrideArg first, ...) {
     }
 }
 
+void __append_impl(const char* query, BrideArg first, ...) {
+    va_list args;
+    va_start(args, first);
+
+    char* html = bride_render(first, args);
+
+    va_end(args);
+
+    if (html) {
+        add_at(query, html);
+        free(html);
+    }
+}
+
+void style_file(const char* filename) {
+    if (filename == NULL) {
+        return;
+    }
+
+    const char* prefix = "<link rel=\"stylesheet\" href=\"";
+    const char* suffix = "\">";
+
+    size_t size = strlen(prefix) + strlen(filename) + strlen(suffix) + 1;
+    char* html = malloc(size);
+
+    if (html == NULL) {
+        return;
+    }
+
+    snprintf(html, size, "%s%s%s", prefix, filename, suffix);
+
+    add_at("head", html);
+    free(html);
+}
 BrideArg text(const char* value) {
     return bride_html(create_text_tag(value));
 }

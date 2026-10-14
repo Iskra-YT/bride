@@ -164,6 +164,35 @@ npx bride dev            # local development on http://localhost:9876
 `dist/` is a plain static bundle. Deploy it to any static host — no server-side
 runtime is required.
 
+## Smoke testing the package
+
+`tests/smoke/` checks the package the way a user consumes it: `npm pack`, install
+the tarball into an empty directory, `bride new <language>`, `bride build`, and
+then run the result.
+
+```sh
+npm run smoke                  # C, executed in Node.js
+npm run smoke -- --lang cpp    # a different language: c, cpp or c3
+npm run smoke -- --browser     # also open the built app in Chromium
+```
+
+Everything happens in a throw-away directory, so the repository is left as it
+was. Emscripten (and `c3c` for C3) has to be on `PATH`.
+
+| Step | What is verified |
+|------|------------------|
+| `npm pack` | the tarball is created, and the installed CLI is that tarball |
+| `npm install <tarball>` | the published package pulls in its own dependencies |
+| `bride new <language>` | every language template scaffolds a project |
+| `bride build` | the build succeeds and produces the documented output |
+| `run-app.mjs` | the built app renders, routes and handles clicks without errors |
+| `browser.mjs` | the same in Chromium, with no console or page errors |
+
+This runs in CI for every supported language
+([`.github/workflows/smoke.yml`](../.github/workflows/smoke.yml)), and
+[`.github/workflows/release.yml`](../.github/workflows/release.yml) publishes to
+npm after a version tag.
+
 ## See also
 
 - [Getting started](getting-started.md) — a guided walkthrough.
