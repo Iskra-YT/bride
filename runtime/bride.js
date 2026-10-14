@@ -21,6 +21,21 @@ function render() {
     instance.exports.dispatch(route.handler);
 }
 
+function navigate(path) {
+    const target = typeof path === "string" && path.length > 0 ? path : "/";
+    const current =
+        window.location.pathname +
+        window.location.search +
+        window.location.hash;
+
+    if (current === target) {
+        return;
+    }
+
+    window.history.pushState({}, "", target);
+    render();
+}
+
 function onDocumentClick(event) {
     if (event.defaultPrevented || event.button !== 0) {
         return;
@@ -112,19 +127,7 @@ export const Bride = {
             navigate: (path_ptr, path_len) => {
                 const path = wasmString(memory, path_ptr, path_len);
 
-                const target =
-                    typeof path === "string" && path.length > 0 ? path : "/";
-                const current =
-                    window.location.pathname +
-                    window.location.search +
-                    window.location.hash;
-
-                if (current === target) {
-                    return;
-                }
-
-                window.history.pushState({}, "", target);
-                render();
+                navigate(path);
             },
         });
 
