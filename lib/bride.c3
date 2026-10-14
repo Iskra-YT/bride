@@ -352,7 +352,7 @@ extern fn Tag* tag_template(Tag** childrens, Attribute** attributes) @cname("cre
 extern fn Tag* tag_slot(Tag** childrens, Attribute** attributes) @cname("create_slot_tag");
 
 // CSS
-extern fn void style_file(const char* filename) @cname("style_file");
+extern fn void style_file(char* filename) @cname("style_file");
 
 fn Arg arg_html(Tag* tag) => { .type = BRIDE_HTML, .value = tag };
 
@@ -640,5 +640,5 @@ macro void change(char* query, Arg... args)
 }
 
 macro void append(char* query, Arg... args) {
-	append_tree_at(query, collect((&tag_fragment, args)));
+	append_tree_at(query, collect(&tag_fragment, args));
 }
