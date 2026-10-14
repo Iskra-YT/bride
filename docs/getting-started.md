@@ -27,7 +27,7 @@ Install Bride, then scaffold a project into the current directory with
 mkdir my-app
 cd my-app
 
-npm install bride
+npm install bride-cli
 
 npx bride new c
 ```

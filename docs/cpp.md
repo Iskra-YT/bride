@@ -13,7 +13,7 @@ lives in the `bride` namespace.
 ```sh
 mkdir my-app
 cd my-app
-npm install bride
+npm install bride-cli
 npx bride new cpp
 ```
 

@@ -13,7 +13,7 @@ and the C header is what C++ and C3 build on top of.
 ```sh
 mkdir my-app
 cd my-app
-npm install bride
+npm install bride-cli
 npx bride new c
 ```
 
