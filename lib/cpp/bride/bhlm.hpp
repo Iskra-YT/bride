@@ -6,6 +6,7 @@
 namespace bride {
     using ::BrideArg;
     using ::BrideArgType;
+    using ::BrideRef;
 
     // Helpers
     using ::action;
@@ -197,6 +198,9 @@ namespace bride {
 
     // CSS
     using ::style_file;
+
+    // References
+    using ::ref;
 }
 
 #endif // BRIDE_HIGH_LEVEL_MODULE_HPP

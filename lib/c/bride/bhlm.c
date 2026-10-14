@@ -265,6 +265,18 @@ BrideArg id(const char* name) {
     return attr("id", name);
 }
 
+long ref_id = 0; 
+BrideArg ref(BrideRef* reference) {
+    char* idv = (char*)calloc(32, sizeof(char));
+    sprintf(idv, "%ld", ++ref_id);
+
+    char* ref_idv = (char*)calloc(32, sizeof(char));
+    sprintf(ref_idv, "#%s", idv);
+    
+    *reference = ref_idv;
+    return id(idv);
+}
+
 BrideArg class_(const char* name) {
     return attr("class", name);
 }

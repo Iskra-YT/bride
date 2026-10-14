@@ -97,6 +97,53 @@ Use `navigate(path)` to change pages from code. Same-origin `<a href>` links are
 intercepted automatically, so navigation never reloads the page. See
 [Routing](api-reference.md#routing) for matching rules and details.
 
+## References
+
+When an element must be updated later but you don't want to manage ids by hand,
+use `ref`. Declare a reference initialized to `EMPTY_REF` and pass its address
+inside the tag:
+
+```c
+#include "bride.h"
+
+int count = 0;
+
+BrideRef counter = EMPTY_REF;
+
+void increment(void) {
+    count++;
+    change(counter, textf("Clicks: %d", count));
+}
+
+void main_page(void) {
+    ui(
+        p(
+            ref(&counter),      // renders <p id="1"> and sets counter to "#1"
+            textf("Clicks: %d", count)
+        ),
+        button(
+            text("Increment"),
+            on_click(increment)
+        )
+    );
+}
+```
+
+`ref` writes a ready-made CSS selector (`"#1"`, `"#2"`, ...) into the reference,
+so you can pass it straight to `change`, `append`, or `add_at`:
+
+```c
+append(counter, text("Extra text"));
+```
+
+- The element itself receives the bare id (`id="1"`); the reference holds the
+  selector form (`"#1"`).
+- Every call to `ref` allocates a **new** id and updates the variable. A handler
+  that re-renders with `ref` again moves the element to a different id — the
+  reference then points at the newest one, so read it after rendering.
+- Generated ids are plain decimal numbers (`"1"`, `"2"`, ...). Use
+  `id("custom")` when you want a readable, hand-picked id.
+
 ## Build and run
 
 ```sh

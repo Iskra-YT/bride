@@ -110,6 +110,55 @@ int main(void) {
 Use `bride::navigate(path)` to change pages from code. See
 [Routing](api-reference.md#routing) for matching rules and details.
 
+## References
+
+When an element must be updated later but you don't want to manage ids by hand,
+use `bride::ref`. Declare a reference initialized to `EMPTY_REF` and pass its
+address inside the tag:
+
+```cpp
+#include "bride.hpp"
+
+int count = 0;
+
+bride::BrideRef counter = EMPTY_REF;
+
+void increment(void) {
+    count++;
+    bride::change(counter, bride::textf("Clicks: %d", count));
+}
+
+void main_page(void) {
+    bride::ui(
+        bride::p(
+            bride::ref(&counter),     // renders <p id="1"> and sets counter to "#1"
+            bride::textf("Clicks: %d", count)
+        ),
+        bride::button(
+            bride::text("Increment"),
+            bride::on_click(increment)
+        )
+    );
+}
+```
+
+`bride::ref` writes a ready-made CSS selector (`"#1"`, `"#2"`, ...) into the
+reference, so you can pass it straight to `bride::change`, `bride::append`, or
+`bride::add_at`:
+
+```cpp
+bride::append(counter, bride::text("Extra text"));
+```
+
+- The element itself receives the bare id (`id="1"`); the reference holds the
+  selector form (`"#1"`).
+- Every call to `bride::ref` allocates a **new** id and updates the variable. A
+  handler that re-renders with `bride::ref` again moves the element to a
+  different id — the reference then points at the newest one, so read it after
+  rendering.
+- Generated ids are plain decimal numbers (`"1"`, `"2"`, ...). Use
+  `bride::id("custom")` when you want a readable, hand-picked id.
+
 ## Build and run
 
 ```sh

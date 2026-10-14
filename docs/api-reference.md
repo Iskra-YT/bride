@@ -224,12 +224,50 @@ attribute:
 | `attr(name, value)` | Sets any attribute to any value. |
 | `id(name)` | Shorthand for `attr("id", name)`. |
 | `class(name)` / `class_(name)` | Shorthand for `attr("class", name)`. Use `class` in C and `class_` in C++ and C3. |
+| `ref(&reference)` | Assigns a fresh unique `id` to the element and writes a ready-to-use selector to `reference`. See [References](#references). |
 
 Use `attr` for attributes that have no dedicated helper:
 
 ```c
 input(attr("data-role", "search"))
 ```
+
+### References
+
+`ref` hands out element ids for you. Declare a reference variable initialized to
+`EMPTY_REF` and pass its address to `ref` inside a tag. Bride assigns a fresh,
+unique id — the decimal strings `"1"`, `"2"`, ... — sets it as the element's
+`id` attribute, and stores a ready-to-use CSS selector (`"#1"`, `"#2"`, ...) in
+your variable so you can target the element later:
+
+```c
+BrideRef list = EMPTY_REF;
+
+ui(
+    ul_(
+        ref(&list),          // renders <ul id="1"> and sets list to "#1"
+        li(text("First"))
+    )
+);
+```
+
+The reference **is** the element's selector, so pass it directly to `change`,
+`append`, or `add_at`:
+
+```c
+append(list, li(textf("Item %d", ++count)));
+```
+
+- `BrideRef` is `char*` (`bride::Ref` in C3). `EMPTY_REF` is the "not assigned
+  yet" value — `NULL` in C, `nullptr` in C++, and `bride::EMPTY_REF` in C3.
+- The element itself gets the bare id (`id="1"`); the reference holds the
+  selector form (`"#1"`).
+- Every call to `ref` allocates a **new** id and re-writes the variable, so a
+  re-render that calls `ref` again re-points the element at a different id — the
+  reference then locates the newest one.
+- The generated strings are heap-allocated and live for the lifetime of the
+  module.
+- Prefer `id("name")` when you want a readable, hand-picked id.
 
 ### Boolean attributes
 
@@ -455,6 +493,7 @@ keyword workarounds differ.
 | Text | `text` / `textf` | `bride::text` / `bride::textf` | `bride::text` / `bride::textf` |
 | Tags | `p(...)` | `bride::p(...)` | `bride::p(...)` |
 | Class helper | `class(...)` | `bride::class_(...)` | `bride::class_(...)` |
+| Reference type | `BrideRef` | `bride::BrideRef` | `bride::Ref` |
 | `var` tag | `var(...)` | `bride::var(...)` | `bride::var_(...)` |
 | Handler type | `void (*)(void)` | `void (*)(void)` | `fn void()` |
 | Route a page | `route("/", page)` | `bride::route("/", page)` | `bride::route("/", page)` |

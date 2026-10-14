@@ -153,10 +153,14 @@ struct Arg
 alias Handler = fn void();
 alias TagFactory = fn Tag*(Tag** childrens, Attribute** attributes);
 
+typedef Ref = char*;
 
 extern fn void commit(char* html);
 extern fn void commit_at(char* query, char* html);
 extern fn void add_at(char* query, char* html);
+
+// Refs
+extern fn Arg ref(Ref* reference);
 
 // Routing
 extern fn void route(char* path, Handler handler);
@@ -642,3 +646,5 @@ macro void change(char* query, Arg... args)
 macro void append(char* query, Arg... args) {
 	append_tree_at(query, collect(&tag_fragment, args));
 }
+
+const Ref EMPTY_REF = (Ref)null;

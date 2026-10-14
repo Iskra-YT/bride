@@ -223,6 +223,16 @@ BrideArg on_wheel(void (*fn)(void));
 // CSS
 void style_file(const char* filename);
 
+// References
+#ifndef __cplusplus
+#define EMPTY_REF ((BrideRef)(NULL))
+#else
+#define EMPTY_REF ((BrideRef)(nullptr))
+#endif
+
+typedef char* BrideRef;
+BrideArg ref(BrideRef* reference);
+
 #ifdef __cplusplus
 } // extern "C"
 #endif
