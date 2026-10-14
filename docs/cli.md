@@ -108,7 +108,7 @@ dist/
 ├── wasi/                  # @bjorn3/browser_wasi_shim
 ├── index.html             # copied from the project root
 ├── main.js                # copied from the project root
-├── css/                   # copied from the project root
+├── css/                   # copied from the project root (when present)
 └── license/
     ├── BRIDE-LICENSE
     ├── WASI-MIT

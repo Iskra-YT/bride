@@ -7,8 +7,11 @@ void increment(void) {
     bride::change("#counter", bride::textf("Clicks: %d", count));
 }
 
-int main(void) {
+void home_page(void) {
     bride::ui(
+        bride::h1(
+            bride::text("Home")
+        ),
         bride::p(
             bride::id("counter"),
             bride::textf("Clicks: %d", count)
@@ -16,6 +19,29 @@ int main(void) {
         bride::button(
             bride::text("Increment"),
             bride::on_click(increment)
+        ),
+        bride::nav(
+            bride::a(bride::href("/about"), bride::text("About"))
         )
     );
+}
+
+void about_page(void) {
+    bride::ui(
+        bride::h1(
+            bride::text("About")
+        ),
+        bride::p(
+            bride::text("Bride example app.")
+        ),
+        bride::nav(
+            bride::a(bride::href("/"), bride::text("Home"))
+        )
+    );
+}
+
+int main(void) {
+    bride::route("/", home_page);
+    bride::route("/about", about_page);
+    return 0;
 }

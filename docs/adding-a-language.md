@@ -54,7 +54,7 @@ events through the same `Bride.dispatch(n)` mechanism used by the runtime.
 Wire the language into the CLI:
 
 1. **Template** — add `template/<language>/` with `index.html`, `main.js`,
-   `css/`, a `src/` folder containing a runnable example, and a `package.json`
+   a `src/` folder containing a runnable example, and a `package.json`
    whose `"language"` field matches the CLI value. `bride new <language>` copies
    this folder verbatim.
 

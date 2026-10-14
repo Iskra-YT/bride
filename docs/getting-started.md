@@ -46,8 +46,6 @@ A freshly scaffolded project looks like this:
 my-app/
 ├── index.html        # Page that hosts the app (contains <main id="app">)
 ├── main.js           # Loads the WASM module through the Bride runtime
-├── css/
-│   └── style.css     # Default stylesheet
 ├── src/
 │   └── main.c        # Your application source (main.cpp / main.c3 also possible)
 ├── package.json      # Must contain the "language" field
