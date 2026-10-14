@@ -2,6 +2,7 @@
 #define BRIDE_HIGH_LEVEL_MODULE_H
 
 #include "./arg.h"
+#include "./router.h"
 
 #ifdef __cplusplus
 extern "C" {

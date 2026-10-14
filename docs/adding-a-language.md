@@ -37,6 +37,7 @@ the C library:
 
 - `ui(...)` and `change(query, ...)` for committing HTML.
 - `text(value)` and `textf(format, ...)` for text nodes.
+- `route(path, page)` and `navigate(path)` for client-side routing.
 - Tag builders for every entry in `lib/c/bride/html/tags.def`.
 - Attribute, boolean, and event helpers (`attr`, `id`, `class_`, `on_click`,
   ...).

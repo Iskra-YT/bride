@@ -15,6 +15,10 @@ namespace bride {
     using ::text;
     using ::textf;
 
+    // Routing
+    using ::route;
+    using ::navigate;
+
     // Attribute helpers
     using ::href;
     using ::src;

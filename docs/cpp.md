@@ -86,6 +86,30 @@ int main(void) {
 
 Event handlers are plain `void (*)(void)` functions, exactly as in C.
 
+## Routing
+
+`bride::route(path, page)` registers a page handler that the runtime renders
+when the URL matches:
+
+```cpp
+void home(void) {
+    bride::ui(bride::h1(bride::text("Home")));
+}
+
+void about(void) {
+    bride::ui(bride::h1(bride::text("About")));
+}
+
+int main(void) {
+    bride::route("/", home);
+    bride::route("/about", about);
+    return 0;
+}
+```
+
+Use `bride::navigate(path)` to change pages from code. See
+[Routing](api-reference.md#routing) for matching rules and details.
+
 ## Build and run
 
 ```sh

@@ -119,6 +119,38 @@ Event helpers: `on_click`, `on_input`, `on_change`, `on_submit`, `on_focus`,
 > Names ending in `_` avoid clashes with language keywords or libc functions:
 > `div_`, `main_`, `time_`, `select_`, `map_`, `template_` (and `var_` in C3).
 
+## Routing
+
+Bride includes an optional client-side router. Register page handlers with
+`route(path, fn)`; the runtime renders the handler whose path matches the
+current URL and intercepts same-origin `<a href>` links for instant navigation.
+
+```c
+#include "bride.h"
+
+void home(void) {
+    ui(
+        h1(text("Home")),
+        a(href("/about"), text("About"))
+    );
+}
+
+void about(void) {
+    ui(h1(text("About")));
+}
+
+int main(void) {
+    route("/", home);
+    route("/about", about);
+    route("*", not_found);   // optional catch-all
+}
+```
+
+Call `navigate("/about")` to change pages from code. Matching ignores the query
+string and trailing slashes, and exact routes win over wildcards. The router is
+History-API based, so `bride dev` serves `index.html` for unknown paths to make
+deep links work.
+
 ---
 
 > Let's Compile the Web.

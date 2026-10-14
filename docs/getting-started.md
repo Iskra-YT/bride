@@ -91,6 +91,10 @@ This builds the project, starts a static server at
 `http://localhost:9876`, and watches `src/` for changes. When a `.c`, `.h`, or
 `.c3` file changes, Bride rebuilds and reloads the browser automatically.
 
+If your app uses the [router](api-reference.md#routing), the dev server also
+serves `index.html` for unknown paths, so deep links like `/about` work on a
+full refresh.
+
 ## Deploy
 
 `dist/` is a plain static bundle. Upload its contents to any static host or

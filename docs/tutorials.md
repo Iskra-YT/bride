@@ -233,6 +233,75 @@ to you.
 
 ---
 
+## 5. Multi-page app with routing
+
+Bride includes a small client-side router. Register page handlers with
+`route(path, fn)`; the runtime renders the handler whose path matches the
+current URL and intercepts same-origin links so navigation does not reload the
+page.
+
+`src/main.c`:
+
+```c
+#include "bride.h"
+
+void home(void) {
+    ui(
+        h1(text("Home")),
+        p(text("Welcome to Bride.")),
+        a(href("/about"), text("About"))
+    );
+}
+
+void about(void) {
+    ui(
+        h1(text("About")),
+        p(text("A tiny client-side router.")),
+        a(href("/"), text("Back home"))
+    );
+}
+
+void not_found(void) {
+    ui(
+        h1(text("404")),
+        p(text("No such page.")),
+        a(href("/"), text("Back home"))
+    );
+}
+
+int main(void) {
+    route("/", home);
+    route("/about", about);
+    route("*", not_found);
+}
+```
+
+What to notice:
+
+- `route(path, fn)` takes the same `void (*)(void)` handlers as events, so a
+  page handler is just a function that renders with `ui`.
+- Plain `<a href>` links to same-origin paths are intercepted by the runtime, so
+  clicking them swaps the page without a reload. The browser back/forward
+  buttons work too.
+- `route("*", not_found)` is an optional catch-all for unknown paths.
+- Registering a route does not render anything; the runtime renders the matching
+  route after `main` returns.
+
+You can also navigate from code, for example after an action:
+
+```c
+void save(void) {
+    /* ...persist... */
+    navigate("/");
+}
+```
+
+> Deep links need server support. `bride dev` serves `index.html` for unknown
+> paths automatically; on a production static host, configure an equivalent
+> rewrite.
+
+---
+
 ## Where to go next
 
 - [API reference](api-reference.md) — every tag, attribute, and event.

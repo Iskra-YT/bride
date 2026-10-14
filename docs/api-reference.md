@@ -294,6 +294,60 @@ calls `Bride.dispatch(n)`.
 > **Handlers do not receive the DOM event.** The runtime provides no way to read
 > the event or the current DOM values. Keep state in the module and re-render.
 
+## Routing
+
+Bride ships an optional client-side router. Register a page handler for a path
+with `route(path, fn)`; the runtime renders the handler whose path matches the
+current URL when the module starts, and again whenever the URL changes.
+
+```c
+void main_page(void) {
+    ui(h1(text("Home")));
+}
+
+void about_page(void) {
+    ui(h1(text("About")));
+}
+
+int main(void) {
+    route("/", main_page);
+    route("/about", about_page);
+    route("*", not_found);      // optional catch-all
+}
+```
+
+| Function | Description |
+|----------|-------------|
+| `route(path, fn)` | Registers a `void (*)(void)` page handler for `path`. |
+| `navigate(path)` | Navigates on the client: pushes a history entry and renders the matching route. |
+
+Matching rules:
+
+- Paths are compared against `location.pathname`. The query string and fragment
+  are ignored, and trailing slashes are normalized (`/about` and `/about/` are
+  the same route).
+- `"*"` is a catch-all, used only when no exact match exists.
+- A path ending in `*` (for example `"/users/*"`) matches the prefix and
+  everything below it.
+- Exact matches always win over wildcards.
+
+Navigation is client-side and never reloads the page:
+
+- Links (`<a href="/about">`) to same-origin paths are intercepted
+  automatically. External links, `target="_blank"`, `download`, and
+  modifier-clicks are left to the browser.
+- The back/forward buttons work through `popstate`.
+- Call `navigate("/about")` from a handler to change the page in code.
+
+> The router uses the History API. A full refresh on a deep link (for example
+> `/about`) requires the host to serve the app's `index.html` for unknown
+> paths; `bride dev` does this automatically.
+
+Handlers are ordinary `void (*)(void)` functions. They cannot read the URL or
+route parameters directly — keep state in the module and re-render. Registering
+a route does **not** render it immediately; the runtime renders the matching
+route once `main` returns.
+
 ## Mixing children and fields
 
 Children and fields can be interleaved freely. This is valid:
@@ -331,6 +385,8 @@ keyword workarounds differ.
 | Class helper | `class(...)` | `bride::class_(...)` | `bride::class_(...)` |
 | `var` tag | `var(...)` | `bride::var(...)` | `bride::var_(...)` |
 | Handler type | `void (*)(void)` | `void (*)(void)` | `fn void()` |
+| Route a page | `route("/", page)` | `bride::route("/", page)` | `bride::route("/", page)` |
+| Navigate | `navigate("/about")` | `bride::navigate("/about")` | `bride::navigate("/about")` |
 | Entry point | `int main(void)` | `int main(void)` | `fn void main()` |
 
 `div_`, `main_`, `time_`, `select_`, `map_`, and `template_` keep their trailing
@@ -359,6 +415,21 @@ await Bride.start({
 |--------|-------------|
 | `Bride.start(options)` | Instantiates the module, wires the `commit`/`commit_at` imports, calls the WASI initializer, and runs the module's `_start`. Throws if `root` does not match an element or if the module exports no memory. |
 | `Bride.dispatch(number)` | Calls the event handler registered under `number`. Used internally by generated `on*` attributes. |
+| `Bride.navigate(path)` | Client-side navigation: pushes a history entry and renders the matching route. |
+| `Bride.render()` | Re-renders the route matching the current URL. |
+
+### Runtime imports
+
+The router is driven by two additional imports the runtime provides to the
+module:
+
+| Import | Signature | Provided by |
+|--------|-----------|-------------|
+| `route` | `(pathPtr, pathLen, handler) => void` | The `route()` helper. |
+| `navigate` | `(pathPtr, pathLen) => void` | The `navigate()` helper. |
+
+They only exist when your program uses routing, so a module that never calls
+`route` does not import them.
 
 See [Architecture](architecture.md) for the full lifecycle.
 

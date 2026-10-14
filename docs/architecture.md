@@ -44,6 +44,8 @@ well-defined contract.
 |--------|--------|-----------|-------------|
 | `env` | `commit` | `(ptr: i32, len: i32) => void` | Bride runtime |
 | `env` | `commit_at` | `(queryPtr: i32, queryLen: i32, htmlPtr: i32, htmlLen: i32) => void` | Bride runtime |
+| `env` | `route` | `(pathPtr: i32, pathLen: i32, handler: i32) => void` | Bride runtime |
+| `env` | `navigate` | `(pathPtr: i32, pathLen: i32) => void` | Bride runtime |
 | `wasi_snapshot_preview1` | (many) | — | `@bjorn3/browser_wasi_shim` |
 
 `commit` receives a pointer and length into the module's linear memory. The
@@ -169,6 +171,37 @@ on first use and lives for the lifetime of the module.
 > truth in the module's own state and re-render from it. Native form submission
 > still works because the browser handles it.
 
+## Routing
+
+Routing reuses the dispatch table. When your program calls `route(path, fn)`:
+
+1. The C helper registers `fn` with `create_dispatch` and gets back an integer
+   handler key.
+2. It calls the imported `route(pathPtr, pathLen, key)` function.
+3. The runtime decodes the path and stores a `{ path, handler }` entry.
+
+Once `_start` has returned, the runtime matches `location.pathname` against the
+registered routes. If a route matches, it calls `dispatch(key)`, which invokes
+the page handler; the handler typically calls `ui(...)` and commits HTML.
+
+Navigation is driven by the runtime:
+
+- `navigate(path)` (C) calls the imported `navigate` function; the runtime calls
+  `history.pushState` and re-renders.
+- Clicking a same-origin `<a href>` is intercepted at the document level and
+  routed the same way, so links do not trigger a full reload.
+- The `popstate` event re-renders the route for the new URL, so back and forward
+  work.
+
+Route matching itself is pure JavaScript in `runtime/router.js`
+(`normalizePath` / `matchRoute`), which keeps it independent of the DOM and easy
+to unit-test.
+
+> Because routing is History-API based, a full refresh on a deep link requires
+> the host to return `index.html` for unknown paths. The `bride dev` server does
+> this; production hosts need an equivalent rewrite (or a hash-based route
+> scheme).
+
 ## Build pipeline
 
 `bride build` ([`bin/build.js`](../bin/build.js)) orchestrates the toolchain:
@@ -205,9 +238,11 @@ small generated entry shim that maps Emscripten's `__main_argc_argv` onto the C3
 | `bin/compile.js` | Per-language compile steps and `libbride.a`. |
 | `bin/utils.js` | Toolchain detection and file helpers. |
 | `node_modules/@bjorn3/browser_wasi_shim` | WASI implementation copied into `dist/wasi/`. |
-| `runtime/bride.js` | The `Bride` object: `start` and `dispatch`. |
+| `runtime/bride.js` | The `Bride` object: `start`, `dispatch`, and `navigate`. |
+| `runtime/router.js` | Pure route matching helpers (`normalizePath`, `matchRoute`). |
 | `runtime/wasm.js` | Module loading and string decoding. |
 | `lib/c/bride/js.*` | `commit` / `commit_at` wrappers over the imports. |
+| `lib/c/bride/router.*` | `route` / `navigate` helpers over the imports. |
 | `lib/c/bride/dispatch.c` | The dispatch table. |
 | `lib/c/bride/html/` | Tag model, `tags.def`, and the serializer. |
 | `lib/c/bride/bhlm.*` | The high-level DSL macros and helpers. |

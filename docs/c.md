@@ -72,6 +72,31 @@ What happens:
 4. Clicking the button calls `Bride.dispatch(n)`, which invokes `increment`.
 5. `change("#counter", ...)` re-renders only the `#counter` element.
 
+## Routing
+
+`route(path, fn)` registers a page handler that the runtime renders when the URL
+matches. Handlers are ordinary `void (*)(void)` functions:
+
+```c
+void main_page(void) {
+    ui(h1(text("Home")));
+}
+
+void about_page(void) {
+    ui(h1(text("About")));
+}
+
+int main(void) {
+    route("/", main_page);
+    route("/about", about_page);
+    return 0;
+}
+```
+
+Use `navigate(path)` to change pages from code. Same-origin `<a href>` links are
+intercepted automatically, so navigation never reloads the page. See
+[Routing](api-reference.md#routing) for matching rules and details.
+
 ## Build and run
 
 ```sh

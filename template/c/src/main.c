@@ -7,7 +7,7 @@ void increment(void) {
     change("#counter", textf("Clicks: %d", count));
 }
 
-int main(void) {
+void main_page(void) {
     ui(
         p(
             id("counter"),
@@ -18,4 +18,9 @@ int main(void) {
             on_click(increment)
         )
     );
+}
+
+int main(void) {
+    route("/", main_page);
+    return 0;
 }

@@ -13,4 +13,12 @@ extern void __commit_at(
 ) __attribute__((import_module("env")))
   __attribute__((import_name("commit_at")));
 
+extern void __route(const char* path, int len, int handler)
+    __attribute__((import_module("env")))
+    __attribute__((import_name("route")));
+
+extern void __navigate(const char* path, int len)
+    __attribute__((import_module("env")))
+    __attribute__((import_name("navigate")));
+
 #endif

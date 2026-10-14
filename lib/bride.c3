@@ -157,6 +157,10 @@ alias TagFactory = fn Tag*(Tag** childrens, Attribute** attributes);
 extern fn void commit(char* html);
 extern fn void commit_at(char* query, char* html);
 
+// Routing
+extern fn void route(char* path, Handler handler);
+extern fn void navigate(char* path);
+
 extern fn Arg attr(char* name, char* value);
 extern fn Arg id(char* name);
 extern fn Arg class_(char* name);

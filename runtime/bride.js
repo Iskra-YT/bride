@@ -1,7 +1,79 @@
 import { loadWasm, wasmString } from "./wasm.js";
+import { matchRoute } from "./router.js";
 
 let instance = null;
 let memory = null;
+
+const routes = [];
+let listening = false;
+
+function render() {
+    if (!instance || typeof instance.exports.dispatch !== "function") {
+        return;
+    }
+
+    const route = matchRoute(routes, window.location.pathname);
+
+    if (!route) {
+        return;
+    }
+
+    instance.exports.dispatch(route.handler);
+}
+
+function onDocumentClick(event) {
+    if (event.defaultPrevented || event.button !== 0) {
+        return;
+    }
+
+    if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+        return;
+    }
+
+    const anchor = event.target?.closest?.("a[href]");
+
+    if (!anchor) {
+        return;
+    }
+
+    if (anchor.target && anchor.target !== "_self") {
+        return;
+    }
+
+    if (anchor.hasAttribute("download")) {
+        return;
+    }
+
+    const url = new URL(anchor.href, window.location.href);
+
+    if (url.origin !== window.location.origin) {
+        return;
+    }
+
+    if (
+        url.pathname === window.location.pathname &&
+        url.search === window.location.search
+    ) {
+        return;
+    }
+
+    event.preventDefault();
+    navigate(url.pathname + url.search + url.hash);
+}
+
+function initRouter() {
+    if (routes.length === 0) {
+        return;
+    }
+
+    if (!listening) {
+        window.addEventListener("popstate", render);
+        document.addEventListener("click", onDocumentClick);
+        listening = true;
+    }
+
+    render();
+}
 
 // API
 export const Bride = {
@@ -32,6 +104,28 @@ export const Bride = {
                     element.innerHTML = html;
                 }
             },
+            route: (path_ptr, path_len, handler) => {
+                const path = wasmString(memory, path_ptr, path_len);
+
+                routes.push({ path, handler });
+            },
+            navigate: (path_ptr, path_len) => {
+                const path = wasmString(memory, path_ptr, path_len);
+
+                const target =
+                    typeof path === "string" && path.length > 0 ? path : "/";
+                const current =
+                    window.location.pathname +
+                    window.location.search +
+                    window.location.hash;
+
+                if (current === target) {
+                    return;
+                }
+
+                window.history.pushState({}, "", target);
+                render();
+            },
         });
 
         memory = instance.exports.memory;
@@ -50,6 +144,8 @@ export const Bride = {
                 }
             }
         }
+
+        initRouter();
     },
 
     dispatch(number) {
@@ -58,5 +154,13 @@ export const Bride = {
         }
 
         return instance.exports.dispatch(number);
+    },
+
+    navigate(path) {
+        navigate(path);
+    },
+
+    render() {
+        render();
     },
 };
