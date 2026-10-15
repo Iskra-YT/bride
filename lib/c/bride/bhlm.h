@@ -3,6 +3,7 @@
 
 #include "./arg.h"
 #include "./router.h"
+#include "./style.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -170,7 +171,6 @@ BrideArg name(const char* value);
 BrideArg value(const char* value);
 BrideArg placeholder(const char* value);
 BrideArg for_(const char* value);
-BrideArg style(const char* value);
 BrideArg target(const char* value);
 BrideArg rel(const char* value);
 BrideArg role(const char* value);
@@ -235,6 +235,20 @@ BrideArg ref(BrideRef* reference);
 
 #ifdef __cplusplus
 } // extern "C"
-#endif
+
+// `style` is overloaded instead of dispatched by a macro: a bare string sets
+// the inline `style` attribute, while declarations build a reusable BrideStyle
+// (see style.h).
+inline BrideArg style(const char* value) {
+    return __style_inline_impl(value);
+}
+
+template <typename... Rest>
+inline BrideStyle style(BrideArg first, Rest... rest) {
+    BrideArg args[sizeof...(Rest) + 1] = { first, rest... };
+
+    return __style_build(args, (int)(sizeof...(Rest) + 1));
+}
+#endif // __cplusplus
 
 #endif // BRIDE_HIGH_LEVEL_MODULE_H

@@ -210,12 +210,11 @@ attribute:
 | `value` | `value` | `pattern` | `pattern` |
 | `placeholder` | `placeholder` | `rows` | `rows` |
 | `for_` | `for` | `cols` | `cols` |
-| `style` | `style` | `method` | `method` |
-| `target` | `target` | `form_action` | `action` |
-| `rel` | `rel` | `enctype` | `enctype` |
-| `role` | `role` | `loading` | `loading` |
-| `width` | `width` | `download` | `download` |
-| `height` | `height` | | |
+| `target` | `target` | `method` | `method` |
+| `rel` | `rel` | `form_action` | `action` |
+| `role` | `role` | `enctype` | `enctype` |
+| `width` | `width` | `loading` | `loading` |
+| `height` | `height` | `download` | `download` |
 
 ### Generic helpers
 
@@ -342,16 +341,73 @@ calls `Bride.dispatch(n)`.
 
 ## Styling
 
-Bride renders plain HTML, so apps are styled with ordinary CSS — there is no
-styling DSL. Two field helpers and one startup function cover the common cases.
+Bride renders plain HTML, so apps are styled with ordinary CSS. Declarations
+build reusable styles that `apply(...)` puts on elements; inline styles, class
+names and stylesheet links are one helper each.
 
 | Helper | Description |
 |--------|-------------|
-| `style("...")` | Sets the inline `style` attribute of an element. |
+| `style("...")` | Sets the inline `style` attribute of an element. In C3 there is no overloading, so the inline helper is called `style_attr("...")` there. |
+| `style(declaration, ...)` | Builds a reusable `BrideStyle` and injects its generated rule into `<head>`. |
+| `apply(style)` | Sets the generated class of a `BrideStyle` on an element. |
 | `class("...")` / `class_("...")` | Sets the `class` attribute. Use `class` in C and `class_` in C++ and C3. |
 | `style_file("...")` | Appends a `<link rel="stylesheet">` for the given path to `<head>`. |
 
-Inline styles and class names are ordinary fields, accepted by every tag:
+### Reusable styles
+
+Pass declarations to `style(...)` to get a `BrideStyle`, then put its class on
+an element with `apply(...)`:
+
+```c
+BrideStyle button_style = style(
+    padding(12, "px"),
+    background("#1e1e2e"),
+    color("#cdd6f4")
+);
+
+ui(
+    button(
+        text("Click me"),
+        apply(button_style)
+    )
+);
+```
+
+`style(...)` compiles the declarations into a rule and injects it into `<head>`
+through `add_at`, exactly like `style_file` appends its `<link>`:
+
+```html
+<style>.bride-style-1{padding:12px;background:#1e1e2e;color:#cdd6f4;}</style>
+```
+
+`apply` renders `class="bride-style-1"`. Class names are generated
+(`bride-style-1`, `bride-style-2`, ...) and **identical declarations reuse the
+same class**, so calling `style(...)` from a render function does not pile up
+rules. `apply` merges with other classes, so `class("card")` and
+`apply(button_style)` produce `class="card bride-style-1"`.
+
+> `BrideStyle` values are owned by the library and live for the whole program,
+> so declare them once — at the top of the module, or assign them in `main` —
+> rather than rebuilding them on every render. The declarations are freed after
+> the rule is built, and declarations with an empty value are skipped: a style
+> that has none left (for example `style(raw_css(""))`) builds nothing, and
+> `apply` on it renders nothing.
+
+### Declarations
+
+| Declaration | Description |
+|-------------|-------------|
+| `css(property, value)` | Any property: `css("font-variant", "small-caps")`. |
+| `raw_css("declarations")` | Splices raw declarations in: `raw_css("cursor:pointer")`. |
+| `padding`, `margin`, `gap`, `row_gap`, `column_gap`, `border_radius`, `letter_spacing`, `word_spacing`, `font_size`, `min_width`, `min_height`, `max_width`, `max_height`, `top`, `right`, `bottom`, `left` | A number and its unit: `padding(12, "px")` → `padding:12px;`. Pass an empty unit for unitless values. |
+| `background`, `color`, `opacity`, `display`, `position`, `overflow`, `cursor`, `z_index`, `font_family`, `font_style`, `font_weight`, `line_height`, `text_align`, `text_transform`, `text_decoration`, `text_shadow`, `white_space`, `word_break`, `border`, `outline`, `box_sizing`, `box_shadow`, `flex`, `flex_direction`, `flex_wrap`, `justify_content`, `align_items`, `align_content`, `align_self`, `grid_template_columns`, `grid_template_rows`, `transition`, `transform`, `filter`, `animation` | A ready-to-use value: `display("flex")` → `display:flex;`. |
+
+Every declaration takes a single value; shorthand properties are written as one
+string (`padding("1rem 2rem")` — or `css`/`raw_css` for anything unusual).
+
+### Inline styles
+
+`style("...")` sets the `style` attribute directly, without touching `<head>`:
 
 ```c
 ui(
@@ -363,6 +419,17 @@ ui(
     )
 );
 ```
+
+In C3, where two functions cannot share a name, that helper is `style_attr`:
+
+```c3
+bride::div_(
+    bride::style_attr("padding: 1rem"),
+    bride::text("Hello")
+);
+```
+
+### Stylesheets
 
 For real stylesheets, call `style_file` once at startup. The path is relative
 to the generated `index.html`, so keep your CSS in a `css/` folder at the
@@ -493,6 +560,10 @@ keyword workarounds differ.
 | Text | `text` / `textf` | `bride::text` / `bride::textf` | `bride::text` / `bride::textf` |
 | Tags | `p(...)` | `bride::p(...)` | `bride::p(...)` |
 | Class helper | `class(...)` | `bride::class_(...)` | `bride::class_(...)` |
+| Inline style | `style("...")` | `bride::style("...")` | `bride::style_attr("...")` |
+| Build a style | `style(decls...)` | `bride::style(decls...)` | `bride::style(decls...)` |
+| Apply a style | `apply(s)` | `bride::apply(s)` | `bride::apply(s)` |
+| Style type | `BrideStyle` | `bride::BrideStyle` | `bride::BrideStyle` |
 | Reference type | `BrideRef` | `bride::BrideRef` | `bride::Ref` |
 | `var` tag | `var(...)` | `bride::var(...)` | `bride::var_(...)` |
 | Handler type | `void (*)(void)` | `void (*)(void)` | `fn void()` |
@@ -502,6 +573,10 @@ keyword workarounds differ.
 
 `div_`, `main_`, `time_`, `select_`, `map_`, and `template_` keep their trailing
 underscore in every language. `var_` keeps it only in C3.
+
+`style` is overloaded in C and C++: a single string is the inline `style`
+attribute, declarations build a reusable [style](#reusable-styles). C3 has no
+overloading, so its inline helper is `style_attr`.
 
 ## JavaScript runtime API
 

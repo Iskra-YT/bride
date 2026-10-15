@@ -144,6 +144,31 @@ append(counter, text("Extra text"));
 - Generated ids are plain decimal numbers (`"1"`, `"2"`, ...). Use
   `id("custom")` when you want a readable, hand-picked id.
 
+## Styling
+
+`style(...)` builds a reusable class and `apply(...)` puts it on an element:
+
+```c
+BrideStyle button_style = style(
+    padding(12, "px"),
+    background("#1e1e2e"),
+    color("#cdd6f4")
+);
+
+ui(
+    button(
+        text("Click me"),
+        apply(button_style)
+    )
+);
+```
+
+The declarations are compiled into a rule that is injected into `<head>` once,
+and `apply` renders the matching class (`class="bride-style-1"`). Use
+`style("...")` for an inline `style` attribute and `style_file("css/style.css")`
+for a stylesheet link. See [Styling](api-reference.md#styling) for the full list
+of declarations.
+
 ## Build and run
 
 ```sh

@@ -115,8 +115,20 @@ try {
     check(home.length > 0, "the app renders on start", JSON.stringify(home.slice(0, 80)));
     check(/<h[\dl]/.test(home), "the first page contains a heading");
 
-    const styleLink = element("head").innerHTML;
-    console.log(`  info style_file() produced ${JSON.stringify(styleLink)}`);
+    const head = element("head").innerHTML;
+    console.log(`  info <head> contains ${JSON.stringify(head)}`);
+
+    // The templates build a reusable style, which injects its generated rule
+    // into <head> and puts the matching class on the element.
+    const injected = head.match(/<style>\.bride-style-\d+\{[^}]*\}<\/style>/);
+    check(Boolean(injected), "the app injects its generated CSS into <head>", head);
+
+    const className = injected ? injected[0].match(/\.(bride-style-\d+)/)[1] : null;
+    check(
+        className !== null && home.includes(`class="${className}"`),
+        "the styled element carries its generated class",
+        className ?? "no class found",
+    );
 
     // Click handlers are wired to Bride.dispatch in the rendered HTML, so the
     // number found there is the handler the button calls.

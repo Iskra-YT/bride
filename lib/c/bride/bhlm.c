@@ -17,11 +17,15 @@ void bride_parse_args(BrideArg first, va_list args, HtmlChildren* children, Html
     while (arg.type != BRIDE_END) {
         switch (arg.type) {
             case BRIDE_HTML:
-                children_push(children, arg.value);
+                if (arg.value) {
+                    children_push(children, arg.value);
+                }
                 break;
 
             case BRIDE_ATTR:
-                attrs_push(attributes, arg.value);
+                if (arg.value) {
+                    attrs_push(attributes, arg.value);
+                }
                 break;
 
             default:
@@ -294,7 +298,6 @@ BrideArg name(const char* value) { return attr("name", value); }
 BrideArg value(const char* value) { return attr("value", value); }
 BrideArg placeholder(const char* value) { return attr("placeholder", value); }
 BrideArg for_(const char* value) { return attr("for", value); }
-BrideArg style(const char* value) { return attr("style", value); }
 BrideArg target(const char* value) { return attr("target", value); }
 BrideArg rel(const char* value) { return attr("rel", value); }
 BrideArg role(const char* value) { return attr("role", value); }

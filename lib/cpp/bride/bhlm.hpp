@@ -7,6 +7,7 @@ namespace bride {
     using ::BrideArg;
     using ::BrideArgType;
     using ::BrideRef;
+    using ::BrideStyle;
 
     // Helpers
     using ::action;
@@ -30,7 +31,6 @@ namespace bride {
     using ::value;
     using ::placeholder;
     using ::for_;
-    using ::style;
     using ::target;
     using ::rel;
     using ::role;
@@ -198,6 +198,64 @@ namespace bride {
 
     // CSS
     using ::style_file;
+    using ::style;
+    using ::apply;
+    using ::css;
+    using ::raw_css;
+
+    // CSS declarations (see docs/api-reference.md)
+    using ::padding;
+    using ::margin;
+    using ::gap;
+    using ::row_gap;
+    using ::column_gap;
+    using ::font_size;
+    using ::border_radius;
+    using ::letter_spacing;
+    using ::word_spacing;
+    using ::min_width;
+    using ::min_height;
+    using ::max_width;
+    using ::max_height;
+    using ::top;
+    using ::right;
+    using ::bottom;
+    using ::left;
+    using ::background;
+    using ::color;
+    using ::opacity;
+    using ::display;
+    using ::position;
+    using ::overflow;
+    using ::cursor;
+    using ::z_index;
+    using ::font_family;
+    using ::font_style;
+    using ::font_weight;
+    using ::line_height;
+    using ::text_align;
+    using ::text_transform;
+    using ::text_decoration;
+    using ::text_shadow;
+    using ::white_space;
+    using ::word_break;
+    using ::border;
+    using ::outline;
+    using ::box_sizing;
+    using ::box_shadow;
+    using ::flex;
+    using ::flex_direction;
+    using ::flex_wrap;
+    using ::justify_content;
+    using ::align_items;
+    using ::align_content;
+    using ::align_self;
+    using ::grid_template_columns;
+    using ::grid_template_rows;
+    using ::transition;
+    using ::transform;
+    using ::filter;
+    using ::animation;
 
     // References
     using ::ref;

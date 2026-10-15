@@ -117,10 +117,11 @@ proceeds in three stages:
 
 1. **Build a tree.** Each tag macro (`p(...)`, `button(...)`, ...) collects its
    arguments into an `HtmlTag` node. Every argument is a `BrideArg` tagged as
-   either `BRIDE_HTML` (a child node), `BRIDE_ATTR` (an attribute), or
-   `BRIDE_END` (the terminator appended by the macro). Children and attributes
-   are pushed into separate dynamic arrays, which is why they may be interleaved
-   in any order.
+   `BRIDE_HTML` (a child node), `BRIDE_ATTR` (an attribute), `BRIDE_STYLE` (a CSS
+   declaration built by `style(...)`), or `BRIDE_END` (the terminator appended by
+   the macro). Children and attributes are pushed into separate dynamic arrays,
+   which is why they may be interleaved in any order. `BRIDE_STYLE` arguments are
+   ignored by tags — they only mean something inside `style(...)`.
 2. **Serialize.** `repr_html_tag` walks the tree with a per-tag dispatch table
    and produces a single HTML string in a growable buffer.
 3. **Commit.** `ui(...)` renders a fragment and calls `commit`; `change(query,
@@ -252,6 +253,7 @@ small generated entry shim that maps Emscripten's `__main_argc_argv` onto the C3
 | `lib/c/bride/dispatch.c` | The dispatch table. |
 | `lib/c/bride/html/` | Tag model, `tags.def`, and the serializer. |
 | `lib/c/bride/bhlm.*` | The high-level DSL macros and helpers. |
+| `lib/c/bride/style.*` | The style builder (`style`, `apply`, declarations) and its `<head>` injection. |
 | `lib/cpp/` | Header-only C++ re-export of the C API in `namespace bride`. |
 | `lib/bride.c3` | Native C3 bindings. |
 | `template/<language>/` | Starter projects copied by `bride new`. |

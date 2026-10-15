@@ -159,6 +159,32 @@ bride::append(counter, bride::text("Extra text"));
 - Generated ids are plain decimal numbers (`"1"`, `"2"`, ...). Use
   `bride::id("custom")` when you want a readable, hand-picked id.
 
+## Styling
+
+`bride::style(...)` builds a reusable class and `bride::apply(...)` puts it on an
+element:
+
+```cpp
+bride::BrideStyle button_style = bride::style(
+    bride::padding(12, "px"),
+    bride::background("#1e1e2e"),
+    bride::color("#cdd6f4")
+);
+
+bride::ui(
+    bride::button(
+        bride::text("Click me"),
+        bride::apply(button_style)
+    )
+);
+```
+
+The declarations are compiled into a rule that is injected into `<head>` once,
+and `apply` renders the matching class (`class="bride-style-1"`). Use
+`bride::style("...")` for an inline `style` attribute and
+`bride::style_file("css/style.css")` for a stylesheet link. See
+[Styling](api-reference.md#styling) for the full list of declarations.
+
 ## Build and run
 
 ```sh

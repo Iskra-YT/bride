@@ -8,6 +8,7 @@ enum ArgType : int
     BRIDE_HTML,
     BRIDE_ATTR,
     BRIDE_EVENT,
+    BRIDE_STYLE,
     BRIDE_END
 }
 
@@ -150,6 +151,14 @@ struct Arg
     void* value;
 }
 
+// A reusable set of CSS declarations. The layout matches the C `BrideStyle`;
+// building and applying it is delegated to the C library.
+struct BrideStyle
+{
+    char* class_name;
+    char* body;
+}
+
 alias Handler = fn void();
 alias TagFactory = fn Tag*(Tag** childrens, Attribute** attributes);
 
@@ -184,7 +193,6 @@ extern fn Arg name(char* value);
 extern fn Arg value(char* value);
 extern fn Arg placeholder(char* value);
 extern fn Arg for_(char* value);
-extern fn Arg style(char* value);
 extern fn Arg target(char* value);
 extern fn Arg rel(char* value);
 extern fn Arg role(char* value);
@@ -357,6 +365,75 @@ extern fn Tag* tag_slot(Tag** childrens, Attribute** attributes) @cname("create_
 
 // CSS
 extern fn void style_file(char* filename) @cname("style_file");
+
+// Style building is delegated to the C library: `style(...)` lets it compile
+// the declarations into a class and inject the rule into <head>.
+extern fn BrideStyle style_build(Arg* args, int count) @cname("__style_build");
+extern fn Arg apply(BrideStyle style);
+
+// Declarations (see docs/api-reference.md). These are the C helpers, so the
+// numeric ones format `<value><unit>` in one place.
+extern fn Arg css(char* property, char* value);
+extern fn Arg raw_css(char* declarations);
+extern fn Arg padding(double value, char* unit);
+extern fn Arg margin(double value, char* unit);
+extern fn Arg gap(double value, char* unit);
+extern fn Arg row_gap(double value, char* unit);
+extern fn Arg column_gap(double value, char* unit);
+extern fn Arg font_size(double value, char* unit);
+extern fn Arg border_radius(double value, char* unit);
+extern fn Arg letter_spacing(double value, char* unit);
+extern fn Arg word_spacing(double value, char* unit);
+extern fn Arg min_width(double value, char* unit);
+extern fn Arg min_height(double value, char* unit);
+extern fn Arg max_width(double value, char* unit);
+extern fn Arg max_height(double value, char* unit);
+extern fn Arg top(double value, char* unit);
+extern fn Arg right(double value, char* unit);
+extern fn Arg bottom(double value, char* unit);
+extern fn Arg left(double value, char* unit);
+extern fn Arg background(char* value);
+extern fn Arg color(char* value);
+extern fn Arg opacity(char* value);
+extern fn Arg display(char* value);
+extern fn Arg position(char* value);
+extern fn Arg overflow(char* value);
+extern fn Arg cursor(char* value);
+extern fn Arg z_index(char* value);
+extern fn Arg font_family(char* value);
+extern fn Arg font_style(char* value);
+extern fn Arg font_weight(char* value);
+extern fn Arg line_height(char* value);
+extern fn Arg text_align(char* value);
+extern fn Arg text_transform(char* value);
+extern fn Arg text_decoration(char* value);
+extern fn Arg text_shadow(char* value);
+extern fn Arg white_space(char* value);
+extern fn Arg word_break(char* value);
+extern fn Arg border(char* value);
+extern fn Arg outline(char* value);
+extern fn Arg box_sizing(char* value);
+extern fn Arg box_shadow(char* value);
+extern fn Arg flex(char* value);
+extern fn Arg flex_direction(char* value);
+extern fn Arg flex_wrap(char* value);
+extern fn Arg justify_content(char* value);
+extern fn Arg align_items(char* value);
+extern fn Arg align_content(char* value);
+extern fn Arg align_self(char* value);
+extern fn Arg grid_template_columns(char* value);
+extern fn Arg grid_template_rows(char* value);
+extern fn Arg transition(char* value);
+extern fn Arg transform(char* value);
+extern fn Arg filter(char* value);
+extern fn Arg animation(char* value);
+
+// C3 has no overloading, so the inline `style` attribute has its own name
+// (C and C++ overload `style("...")` instead).
+fn Arg style_attr(char* value) => attr("style", value);
+
+// `style(padding(12, "px"), background("#1e1e2e"))` builds a reusable style.
+macro BrideStyle style(Arg... args) => style_build(args.ptr, (int)args.len);
 
 fn Arg arg_html(Tag* tag) => { .type = BRIDE_HTML, .value = tag };
 

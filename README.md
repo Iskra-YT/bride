@@ -104,17 +104,21 @@ and `template_`, `slot`.
 ### Fields
 
 Attribute helpers: `href`, `src`, `alt`, `title`, `type`, `name`, `value`,
-`placeholder`, `for_`, `style`, `target`, `rel`, `role`, `width`, `height`,
+`placeholder`, `for_`, `target`, `rel`, `role`, `width`, `height`,
 `tabindex`, `autocomplete`, `accept`, `min`, `max`, `step`, `pattern`, `rows`,
 `cols`, `method`, `form_action`, `enctype`, `loading`, `download`, plus the
 generic `attr(name, value)`.
+
+Styling: `style(declaration, ...)` builds a reusable style, `apply(style)` puts
+its class on an element, `style("...")` sets an inline `style` attribute (in C3:
+`style_attr("...")`), and `class(...)` / `class_("...")` sets classes.
 
 Boolean helpers: `disabled`, `checked`, `selected`, `required`, `readonly`,
 `multiple`, `autofocus`, `hidden`.
 
 > Bride renders plain HTML, so styling is done with ordinary CSS — see
-> [Styling](docs/api-reference.md#styling) for inline styles, class helpers,
-> and `style_file` stylesheet links.
+> [Styling](docs/api-reference.md#styling) for reusable styles, inline styles,
+> class helpers, and `style_file` stylesheet links.
 
 Event helpers: `on_click`, `on_input`, `on_change`, `on_submit`, `on_focus`,
 `on_blur`, `on_keydown`, `on_keyup`, `on_keypress`, `on_dblclick`,
