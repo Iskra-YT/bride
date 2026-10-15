@@ -93,56 +93,74 @@ function initRouter() {
 // API
 export const Bride = {
     async start(options) {
-        const { wasm, root = "#app" } = options;
+        const { wasm, root = "#app", onError } = options;
+
+        const handleError = typeof onError === "function"
+            ? onError
+            : (err) => {
+                console.error(err);
+            };
 
         if (window.Bride && window.Bride !== Bride) {
-            throw new Error("Bride is already initialized.");
+            handleError(new Error("Bride is already initialized."));
+            return;
         }
         window.Bride = Bride;
 
         const element = document.querySelector(root);
         if (!element) {
-            throw new Error(`Bride root not found: ${root}`);
+            handleError(new Error(`Bride root not found: ${root}`));
+            return;
         }
 
-        instance = await loadWasm(wasm, {
-            commit: (ptr, len) => {
-                const html = wasmString(memory, ptr, len);
-                document.querySelector(root).innerHTML = html;
-            },
-            commit_at: (query_ptr, query_len, html_ptr, html_len) => {
-                const query = wasmString(memory, query_ptr, query_len);
-                const html = wasmString(memory, html_ptr, html_len);
+        const appRoot = element;
 
-                const element = document.querySelector(query);
-                if (element) {
-                    element.innerHTML = html;
-                }
-            },
-            add_at: (query_ptr, query_len, html_ptr, html_len) => {
-                const query = wasmString(memory, query_ptr, query_len);
-                const html = wasmString(memory, html_ptr, html_len);
+        let loadedInstance;
+        try {
+            loadedInstance = await loadWasm(wasm, {
+                commit: (ptr, len) => {
+                    const html = wasmString(memory, ptr, len);
+                    appRoot.innerHTML = html;
+                },
+                commit_at: (query_ptr, query_len, html_ptr, html_len) => {
+                    const query = wasmString(memory, query_ptr, query_len);
+                    const html = wasmString(memory, html_ptr, html_len);
 
-                const element = document.querySelector(query);
-                if (element) {
-                    element.innerHTML += html;
-                }
-            },
-            route: (path_ptr, path_len, handler) => {
-                const path = wasmString(memory, path_ptr, path_len);
+                    const el = document.querySelector(query);
+                    if (el) {
+                        el.innerHTML = html;
+                    }
+                },
+                add_at: (query_ptr, query_len, html_ptr, html_len) => {
+                    const query = wasmString(memory, query_ptr, query_len);
+                    const html = wasmString(memory, html_ptr, html_len);
 
-                routes.push({ path, handler });
-            },
-            navigate: (path_ptr, path_len) => {
-                const path = wasmString(memory, path_ptr, path_len);
+                    const el = document.querySelector(query);
+                    if (el) {
+                        el.innerHTML += html;
+                    }
+                },
+                route: (path_ptr, path_len, handler) => {
+                    const path = wasmString(memory, path_ptr, path_len);
 
-                navigate(path);
-            },
-        });
+                    routes.push({ path, handler });
+                },
+                navigate: (path_ptr, path_len) => {
+                    const path = wasmString(memory, path_ptr, path_len);
 
+                    navigate(path);
+                },
+            });
+        } catch (err) {
+            handleError(err instanceof Error ? err : new Error(String(err)));
+            return;
+        }
+
+        instance = loadedInstance;
         memory = instance.exports.memory;
         if (!memory) {
-            throw new Error("Bride wasm module does not export memory.");
+            handleError(new Error("Bride wasm module does not export memory."));
+            return;
         }
 
         if (instance.exports._start) {
@@ -150,9 +168,9 @@ export const Bride = {
                 instance.exports._start();
             } catch (err) {
                 if (err?.message === "exit with exit code 0") {
-                    // Normal
+                    // Normal exit
                 } else {
-                    throw err;
+                    handleError(err instanceof Error ? err : new Error(String(err)));
                 }
             }
         }

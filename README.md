@@ -59,12 +59,16 @@ import { Bride } from "./bride.js";
 
 await Bride.start({
     wasm: "./main.wasm",
-    root: "#app"
+    root: "#app",
+    onError: error => console.error(error)
 });
 ```
 
 The WASM module is loaded and executed, and the HTML element matching `root`
-(default `#app`) becomes the application root.
+(default `#app`) becomes the application root. When startup fails (missing
+`root`, a failed module load, no exported memory, or an already-initialized
+runtime), `onError` is called with the `Error` and startup stops; it defaults to
+`console.error`.
 
 ## Tags & fields
 

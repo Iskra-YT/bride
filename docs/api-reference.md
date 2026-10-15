@@ -588,7 +588,8 @@ import { Bride } from "./bride.js";
 
 await Bride.start({
     wasm: "./main.wasm",
-    root: "#app"
+    root: "#app",
+    onError: error => console.error(error)
 });
 ```
 
@@ -596,10 +597,11 @@ await Bride.start({
 |--------|------|---------|-------------|
 | `wasm` | `string` | — | URL/path of the WebAssembly module to load. |
 | `root` | `string` | `"#app"` | CSS selector for the element that receives `commit` output. |
+| `onError` | `(error: Error) => void` | `console.error` | Called with an `Error` when startup fails. Startup stops after a critical error. |
 
 | Method | Description |
 |--------|-------------|
-| `Bride.start(options)` | Instantiates the module, wires the `commit`, `commit_at`, and `add_at` imports, calls the WASI initializer, and runs the module's `_start`. Throws if `root` does not match an element or if the module exports no memory. |
+| `Bride.start(options)` | Instantiates the module, wires the `commit`, `commit_at`, and `add_at` imports, calls the WASI initializer, and runs the module's `_start`. Reports failures through `onError` (default `console.error`) and stops; it does not throw for a missing `root`, an already-initialized runtime, a failed module load, or a module without exported memory. |
 | `Bride.dispatch(number)` | Calls the event handler registered under `number`. Used internally by generated `on*` attributes. |
 | `Bride.navigate(path)` | Client-side navigation: pushes a history entry and renders the matching route. |
 | `Bride.render()` | Re-renders the route matching the current URL. |
