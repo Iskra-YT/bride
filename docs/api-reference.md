@@ -10,9 +10,11 @@ namespacing.
 | C        | `#include "bride.h"` | Unqualified (`p`, `text`, `ui`, ...) | `class(...)` |
 | C++      | `#include "bride.hpp"` | `bride::` prefix (`bride::p`, `bride::ui`, ...) | `bride::class_(...)` |
 | C3       | `import bride;` | `bride::` prefix (`bride::p`, `bride::ui`, ...) | `bride::class_(...)` |
+| Zig      | `@import("bride")` | `bride.` prefix (`bride.p`, `bride.ui`, ...) | `bride.class_(...)` |
 
-C, C++, and C3 share the same helper names with one exception: `class` is a
-keyword in C++ and C3, so those languages use `class_`. In C use `class`.
+All languages share the same helper names with one exception: the class helper.
+C uses `class`, while C++, C3, and Zig use `class_` (in C++ and C3 because
+`class` is a keyword there).
 
 Throughout this page, examples are shown in C. See
 [Language mapping](#language-mapping) for the exact spelling of every symbol in
@@ -27,7 +29,9 @@ each language.
 | `append(query, ...)` | Renders the given children and **appends** them to the `innerHTML` of the first element matching the CSS `query`. |
 
 All three take a list of children (plus any fields, though fields are pointless
-at the top level). In C, C++, and C3 `ui`, `change`, and `append` are macros.
+at the top level). In C, C++, and C3 `ui`, `change`, and `append` are macros; in
+Zig they are functions that accept a tuple of arguments, e.g.
+`bride.ui(.{ ... })`.
 
 ```c
 ui(
@@ -54,7 +58,7 @@ append("#list", li(textf("Item %d", ++count)));
 | Function | Description |
 |----------|-------------|
 | `text(value)` | A text node containing `value`. |
-| `textf(format, ...)` | A formatted text node. `printf`-style in C/C++; C3 string formatting in C3. |
+| `textf(format, ...)` | A formatted text node. `printf`-style in C/C++; C3 string formatting in C3; Zig standard formatting (`{d}`, `{s}`, ...) in Zig. |
 
 ```c
 p(text("static string"))
@@ -101,7 +105,7 @@ fields interchangeably.
 | `pre` | `<pre>` | |
 | `kbd` | `<kbd>` | |
 | `samp` | `<samp>` | |
-| `var` | `<var>` | In C3, `var` is a keyword: use `var_`. |
+| `var` | `<var>` | `var` is a keyword in C3 and Zig: use `var_`. |
 | `cite` | `<cite>` | |
 | `abbr` | `<abbr>` | |
 | `q` | `<q>` | |
@@ -192,7 +196,7 @@ tag:
 
 > **Names ending in `_`.** The trailing underscore avoids clashes with language
 > keywords or libc symbols: `div_`, `main_`, `time_`, `select_`, `map_`,
-> `template_` (and `var_` in C3).
+> `template_` (and `var_` in C3 and Zig; the attribute `type` is `type_` in Zig).
 
 ## Fields — attributes
 
@@ -222,7 +226,7 @@ attribute:
 |--------|-------------|
 | `attr(name, value)` | Sets any attribute to any value. |
 | `id(name)` | Shorthand for `attr("id", name)`. |
-| `class(name)` / `class_(name)` | Shorthand for `attr("class", name)`. Use `class` in C and `class_` in C++ and C3. |
+| `class(name)` / `class_(name)` | Shorthand for `attr("class", name)`. Use `class` in C and `class_` in C++, C3, and Zig. |
 | `ref(&reference)` | Assigns a fresh unique `id` to the element and writes a ready-to-use selector to `reference`. See [References](#references). |
 
 Use `attr` for attributes that have no dedicated helper:
@@ -257,8 +261,9 @@ The reference **is** the element's selector, so pass it directly to `change`,
 append(list, li(textf("Item %d", ++count)));
 ```
 
-- `BrideRef` is `char*` (`bride::Ref` in C3). `EMPTY_REF` is the "not assigned
-  yet" value — `NULL` in C, `nullptr` in C++, and `bride::EMPTY_REF` in C3.
+- `BrideRef` is `char*` (`bride::Ref` in C3, `bride.Ref` in Zig). `EMPTY_REF` is
+  the "not assigned yet" value — `NULL` in C, `nullptr` in C++, and
+  `bride::EMPTY_REF` / `bride.EMPTY_REF` in C3 / Zig.
 - The element itself gets the bare id (`id="1"`); the reference holds the
   selector form (`"#1"`).
 - Every call to `ref` allocates a **new** id and re-writes the variable, so a
@@ -311,8 +316,8 @@ Event helpers register a handler and render an inline attribute that calls
 ### Handlers
 
 A handler is a plain function with no arguments and no return value — `void
-(*)(void)` in C/C++, `fn void()` in C3. Each handler is registered in a dispatch
-table and referenced by an integer key.
+(*)(void)` in C/C++, `fn void()` in C3, `fn () void` in Zig. Each handler is
+registered in a dispatch table and referenced by an integer key.
 
 ```c
 void increment(void) {
@@ -347,10 +352,10 @@ names and stylesheet links are one helper each.
 
 | Helper | Description |
 |--------|-------------|
-| `style("...")` | Sets the inline `style` attribute of an element. In C3 there is no overloading, so the inline helper is called `style_attr("...")` there. |
+| `style("...")` | Sets the inline `style` attribute of an element. In C3 and Zig there is no overloading, so the inline helper is called `style_attr("...")` there. |
 | `style(declaration, ...)` | Builds a reusable `BrideStyle` and injects its generated rule into `<head>`. |
 | `apply(style)` | Sets the generated class of a `BrideStyle` on an element. |
-| `class("...")` / `class_("...")` | Sets the `class` attribute. Use `class` in C and `class_` in C++ and C3. |
+| `class("...")` / `class_("...")` | Sets the `class` attribute. Use `class` in C and `class_` in C++, C3, and Zig. |
 | `style_file("...")` | Appends a `<link rel="stylesheet">` for the given path to `<head>`. |
 
 ### Reusable styles
@@ -427,6 +432,15 @@ bride::div_(
     bride::style_attr("padding: 1rem"),
     bride::text("Hello")
 );
+```
+
+Zig spells it the same way:
+
+```zig
+bride.div_(.{
+    bride.style_attr("padding: 1rem"),
+    bride.text("Hello"),
+});
 ```
 
 ### Stylesheets
@@ -551,32 +565,34 @@ appear).
 The DSL surface is identical in every language; only namespacing and a few
 keyword workarounds differ.
 
-| Concept | C | C++ | C3 |
-|---------|---|-----|----|
-| Include / import | `#include "bride.h"` | `#include "bride.hpp"` | `import bride;` |
-| Render to root | `ui(...)` | `bride::ui(...)` | `bride::ui(...)` |
-| Render fragment | `change("#id", ...)` | `bride::change("#id", ...)` | `bride::change("#id", ...)` |
-| Append to fragment | `append("#id", ...)` | `bride::append("#id", ...)` | `bride::append("#id", ...)` |
-| Text | `text` / `textf` | `bride::text` / `bride::textf` | `bride::text` / `bride::textf` |
-| Tags | `p(...)` | `bride::p(...)` | `bride::p(...)` |
-| Class helper | `class(...)` | `bride::class_(...)` | `bride::class_(...)` |
-| Inline style | `style("...")` | `bride::style("...")` | `bride::style_attr("...")` |
-| Build a style | `style(decls...)` | `bride::style(decls...)` | `bride::style(decls...)` |
-| Apply a style | `apply(s)` | `bride::apply(s)` | `bride::apply(s)` |
-| Style type | `BrideStyle` | `bride::BrideStyle` | `bride::BrideStyle` |
-| Reference type | `BrideRef` | `bride::BrideRef` | `bride::Ref` |
-| `var` tag | `var(...)` | `bride::var(...)` | `bride::var_(...)` |
-| Handler type | `void (*)(void)` | `void (*)(void)` | `fn void()` |
-| Route a page | `route("/", page)` | `bride::route("/", page)` | `bride::route("/", page)` |
-| Navigate | `navigate("/about")` | `bride::navigate("/about")` | `bride::navigate("/about")` |
-| Entry point | `int main(void)` | `int main(void)` | `fn void main()` |
+| Concept | C | C++ | C3 | Zig |
+|---------|---|-----|----|-----|
+| Include / import | `#include "bride.h"` | `#include "bride.hpp"` | `import bride;` | `@import("bride")` |
+| Render to root | `ui(...)` | `bride::ui(...)` | `bride::ui(...)` | `bride.ui(.{...})` |
+| Render fragment | `change("#id", ...)` | `bride::change("#id", ...)` | `bride::change("#id", ...)` | `bride.change("#id", .{...})` |
+| Append to fragment | `append("#id", ...)` | `bride::append("#id", ...)` | `bride::append("#id", ...)` | `bride.append("#id", .{...})` |
+| Text | `text` / `textf` | `bride::text` / `bride::textf` | `bride::text` / `bride::textf` | `bride.text` / `bride.textf` |
+| Tags | `p(...)` | `bride::p(...)` | `bride::p(...)` | `bride.p(.{...})` |
+| Class helper | `class(...)` | `bride::class_(...)` | `bride::class_(...)` | `bride.class_(...)` |
+| Inline style | `style("...")` | `bride::style("...")` | `bride::style_attr("...")` | `bride.style_attr("...")` |
+| Build a style | `style(decls...)` | `bride::style(decls...)` | `bride::style(decls...)` | `bride.style(.{decls...})` |
+| Apply a style | `apply(s)` | `bride::apply(s)` | `bride::apply(s)` | `bride.apply(s)` |
+| Style type | `BrideStyle` | `bride::BrideStyle` | `bride::BrideStyle` | `bride.BrideStyle` |
+| Reference type | `BrideRef` | `bride::BrideRef` | `bride::Ref` | `bride.Ref` |
+| `var` tag | `var(...)` | `bride::var(...)` | `bride::var_(...)` | `bride.var_(...)` |
+| `type` attribute | `type(...)` | `bride::type(...)` | `bride::type(...)` | `bride.type_(...)` |
+| Handler type | `void (*)(void)` | `void (*)(void)` | `fn void()` | `fn () void` |
+| Route a page | `route("/", page)` | `bride::route("/", page)` | `bride::route("/", page)` | `bride.route("/", page)` |
+| Navigate | `navigate("/about")` | `bride::navigate("/about")` | `bride::navigate("/about")` | `bride.navigate("/about")` |
+| Entry point | `int main(void)` | `int main(void)` | `fn void main()` | `pub fn main() void` |
 
 `div_`, `main_`, `time_`, `select_`, `map_`, and `template_` keep their trailing
-underscore in every language. `var_` keeps it only in C3.
+underscore in every language. `var_` keeps it in C3 and Zig, and Zig also spells
+the `type` attribute `type_`.
 
 `style` is overloaded in C and C++: a single string is the inline `style`
-attribute, declarations build a reusable [style](#reusable-styles). C3 has no
-overloading, so its inline helper is `style_attr`.
+attribute, declarations build a reusable [style](#reusable-styles). C3 and Zig
+have no overloading, so their inline helper is `style_attr`.
 
 ## JavaScript runtime API
 
@@ -649,4 +665,6 @@ snprintf(html, sizeof(html), "<li>Item %d</li>", i);
 commit_at("#list", html);
 ```
 
-The C3 bindings expose the same two functions as `commit` / `commit_at`.
+The C3 bindings expose the same functions as `commit` / `commit_at` /
+`add_at`. Zig does not re-export these primitives; use `bride.ui`,
+`bride.change`, and `bride.append` instead.

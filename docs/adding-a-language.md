@@ -60,7 +60,7 @@ Wire the language into the CLI:
    this folder verbatim.
 
 2. **Compiler detection** — add a `hasX()` helper in `bin/utils.js` that probes
-   the compiler (see `hasEmcc`, `hasEmpp`, `hasC3c`).
+   the compiler (see `hasEmcc`, `hasEmpp`, `hasC3c`, `hasZig`).
 
 3. **Compile step** — add a `compileX(src, archive)` function in
    `bin/compile.js` that compiles the project sources and links them with the

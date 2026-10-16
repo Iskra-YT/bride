@@ -9,6 +9,7 @@ test("listTemplates lists the scaffolded languages", () => {
     assert.ok(templates.includes("c"));
     assert.ok(templates.includes("cpp"));
     assert.ok(templates.includes("c3"));
+    assert.ok(templates.includes("zig"));
 });
 
 test("newProject rejects an unknown language with a helpful message", () => {

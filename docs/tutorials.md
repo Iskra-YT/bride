@@ -4,9 +4,10 @@ This page builds a few complete, runnable Bride applications. Each tutorial
 assumes you have scaffolded a project and can run `bride dev` — see
 [Getting started](getting-started.md) if you have not.
 
-Examples are written in C. The same programs translate directly to C++ and C3;
-see [Language mapping](api-reference.md#language-mapping) and the individual
-language guides ([C](c.md), [C++](cpp.md), [C3](c3.md)).
+Examples are written in C. The same programs translate directly to C++, C3, and
+Zig; see [Language mapping](api-reference.md#language-mapping) and the
+individual language guides ([C](c.md), [C++](cpp.md), [C3](c3.md),
+[Zig](zig.md)).
 
 ---
 
@@ -311,4 +312,4 @@ void save(void) {
 - [API reference](api-reference.md) — every tag, attribute, and event.
 - [Architecture](architecture.md) — how rendering and dispatch work under the hood.
 - [CLI reference](cli.md) — build and dev-server details.
-- Language guides: [C](c.md), [C++](cpp.md), [C3](c3.md).
+- Language guides: [C](c.md), [C++](cpp.md), [C3](c3.md), [Zig](zig.md).

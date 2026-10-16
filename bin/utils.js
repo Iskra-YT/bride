@@ -32,6 +32,15 @@ export function hasC3c() {
     }
 }
 
+export function hasZig() {
+    try {
+        execFileSync("zig", ["version"], { stdio: "ignore" });
+        return true;
+    } catch {
+        return false;
+    }
+}
+
 export function findFiles(dir, extension) {
     if (!existsSync(dir)) {
         return [];
@@ -66,12 +75,16 @@ export function getC3LibDir() {
     return path.join(getBrideRoot(), "lib");
 }
 
+export function getZigLibDir() {
+    return path.join(getBrideRoot(), "lib", "zig");
+}
+
 export function getBrideFolder() {
     return getBrideRoot();
 }
 
 // File extensions the dev server watches for changes.
-export const SOURCE_EXTENSIONS = [".c", ".h", ".cpp", ".hpp", ".c3"];
+export const SOURCE_EXTENSIONS = [".c", ".h", ".cpp", ".hpp", ".c3", ".zig"];
 
 export function isSourceFile(filename) {
     if (!filename) {

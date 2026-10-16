@@ -4,12 +4,13 @@
 //   * C and C++ from the same source (the C++ layer is header-only, so one file
 //     exercises both).
 //   * C3 when the compiler is installed, linked against the same C objects.
+//   * Zig when the compiler is installed, linked against the same C objects.
 //
 // Skipped when the needed compilers are unavailable.
 import test, { after } from "node:test";
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { execFileSync, spawnSync } from "node:child_process";
+import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -21,8 +22,10 @@ const root = path.resolve(here, "..", "..");
 const libDir = path.join(root, "lib", "c");
 const cppDir = path.join(root, "lib", "cpp");
 const c3Source = path.join(root, "lib", "bride.c3");
+const zigSource = path.join(root, "lib", "zig", "bride.zig");
 const cSource = path.join(here, "style.c");
 const c3TestSource = path.join(here, "style-c3.c3");
+const zigTestSource = path.join(here, "style-zig.zig");
 
 // `dispatch.c` includes <emscripten/emscripten.h>; a native build only needs
 // EMSCRIPTEN_KEEPALIVE to expand to nothing.
@@ -53,6 +56,22 @@ function run(command, args, options = {}) {
     }
 }
 
+// Like `run`, but returns stdout and stderr combined. The Zig assertions report
+// their results with `std.debug.print`, which writes to stderr.
+function runMerged(command, args, options = {}) {
+    const result = spawnSync(command, args, { encoding: "utf8", ...options });
+    const output = `${result.stdout ?? ""}${result.stderr ?? ""}`;
+
+    if (result.error || result.status !== 0) {
+        throw new Error(
+            `${command} ${args.join(" ")} failed (status ${result.status})\n${output}`,
+            { cause: result.error },
+        );
+    }
+
+    return output;
+}
+
 function hasCommand(command, args) {
     try {
         execFileSync(command, args, { stdio: "ignore" });
@@ -76,6 +95,7 @@ function objectsIn(directory) {
 const cCompiler = findCompiler(["cc", "gcc", "clang"]);
 const cppCompiler = findCompiler(["c++", "g++", "clang++"]);
 const c3Compiler = hasCommand("c3c", ["--version"]) ? "c3c" : null;
+const zigCompiler = hasCommand("zig", ["version"]) ? "zig" : null;
 
 const workdir = mkdtempSync(path.join(tmpdir(), "bride-style-"));
 
@@ -189,6 +209,61 @@ test(
         const output = run(binary, [], { encoding: "utf8" });
 
         assert.match(output, /All C3 style checks passed\./, output);
+        assert.doesNotMatch(output, /FAIL/, output);
+    },
+);
+
+test(
+    "the Zig bindings compile to a wasm object",
+    { skip: zigCompiler ? false : "no Zig compiler (zig) found" },
+    () => {
+        const object = path.join(workdir, "bride-zig-wasm.o");
+
+        run(zigCompiler, [
+            "build-obj",
+            "-target",
+            "wasm32-emscripten",
+            zigSource,
+            `-femit-bin=${object}`,
+        ]);
+
+        assert.ok(existsSync(object), "zig produced no object file");
+    },
+);
+
+test(
+    "the Zig bindings build and apply styles",
+    {
+        skip: !cCompiler
+            ? "no C compiler (cc, gcc, clang) found"
+            : zigCompiler
+              ? false
+              : "no Zig compiler (zig) found",
+    },
+    () => {
+        // Zig writes the binary under exactly the name it is given, so on
+        // Windows it needs the `.exe` suffix to be launchable.
+        const binary = path.join(
+            workdir,
+            process.platform === "win32" ? "style-zig.exe" : "style-zig",
+        );
+
+        // The test sources import the bindings through the named `bride` module;
+        // the native build of the C library provides the C symbols.
+        run(zigCompiler, [
+            "build-exe",
+            "--dep",
+            "bride",
+            `-Mroot=${zigTestSource}`,
+            `-Mbride=${zigSource}`,
+            "-lc",
+            `-femit-bin=${binary}`,
+            ...libraryObjects,
+        ]);
+
+        const output = runMerged(binary, []);
+
+        assert.match(output, /All Zig style checks passed\./, output);
         assert.doesNotMatch(output, /FAIL/, output);
     },
 );

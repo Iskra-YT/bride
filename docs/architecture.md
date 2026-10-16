@@ -145,8 +145,9 @@ kind that determines how it renders:
 | `FRAGMENT` | children only, no wrapper element | `fragment`, and the implicit root of `ui`/`change` |
 | `TEXT` | a raw text node | `text`, `textf` |
 
-`tags.def` is preprocessed to generate the tag builders, the C++ re-exports, and
-the C3 bindings, so adding a tag is a one-line change there.
+`tags.def` is the single list of tags: the C builders and tag enum are generated
+from it by the preprocessor, and the C++, C3, and Zig bindings follow the same
+order — so adding a tag starts with a one-line change there.
 
 > **Escaping.** Bride emits text and attribute values verbatim — it does **not**
 > HTML-escape them. Escape untrusted input yourself, or avoid interpolating
@@ -233,7 +234,10 @@ The language-specific compile steps are described in the
 [CLI reference](cli.md#language-specific-compile-steps). Notably, C3 sources are
 compiled by `c3c` to object files and then linked by `emcc` together with a
 small generated entry shim that maps Emscripten's `__main_argc_argv` onto the C3
-`main`.
+`main`. Zig works the same way: `zig build-obj` compiles the project as a
+non-root `app` module alongside a generated Zig entry point (which exports
+`__main_argc_argv` and calls the project's `pub fn main()`), and the resulting
+object is linked by `emcc`.
 
 ## Source layout
 
@@ -256,6 +260,7 @@ small generated entry shim that maps Emscripten's `__main_argc_argv` onto the C3
 | `lib/c/bride/style.*` | The style builder (`style`, `apply`, declarations) and its `<head>` injection. |
 | `lib/cpp/` | Header-only C++ re-export of the C API in `namespace bride`. |
 | `lib/bride.c3` | Native C3 bindings. |
+| `lib/zig/bride.zig` | Native Zig bindings. |
 | `template/<language>/` | Starter projects copied by `bride new`. |
 
 ## See also

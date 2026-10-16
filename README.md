@@ -11,8 +11,10 @@ Bride is the runtime bridge between WebAssembly and the Web.
 | C        | Yes       | [docs/c.md](docs/c.md)   |
 | C++      | Yes       | [docs/cpp.md](docs/cpp.md) |
 | C3       | Yes       | [docs/c3.md](docs/c3.md) |
+| Zig      | Yes       | [docs/zig.md](docs/zig.md) |
+| Go       | No        | —                        |
+| Kotlin   | No        | —                        |
 | Rust     | No        | —                        |
-| Zig      | No        | —                        |
 
 A language is **supported only if** all three of the following are true:
 
@@ -37,7 +39,7 @@ Full documentation lives in [`docs/`](docs/README.md):
 - [Architecture](docs/architecture.md)
 - [Tutorials](docs/tutorials.md)
 - [Styling with CSS](docs/api-reference.md#styling)
-- Language guides: [C](docs/c.md), [C++](docs/cpp.md), [C3](docs/c3.md)
+- Language guides: [C](docs/c.md), [C++](docs/cpp.md), [C3](docs/c3.md), [Zig](docs/zig.md)
 - [Adding a language](docs/adding-a-language.md)
 
 ## How to use
@@ -47,7 +49,7 @@ Create a project and build it with the Bride CLI:
 ```sh
 mkdir my-app && cd my-app
 npm install bride-cli
-npx bride new c       # c | cpp | c3
+npx bride new c       # c | cpp | c3 | zig
 npx bride build       # output goes to dist/
 npx bride dev         # serve at http://localhost:9876 with live reload
 ```
@@ -114,8 +116,8 @@ Attribute helpers: `href`, `src`, `alt`, `title`, `type`, `name`, `value`,
 generic `attr(name, value)`.
 
 Styling: `style(declaration, ...)` builds a reusable style, `apply(style)` puts
-its class on an element, `style("...")` sets an inline `style` attribute (in C3:
-`style_attr("...")`), and `class(...)` / `class_("...")` sets classes.
+its class on an element, `style("...")` sets an inline `style` attribute (in C3
+and Zig: `style_attr("...")`), and `class(...)` / `class_("...")` sets classes.
 
 Boolean helpers: `disabled`, `checked`, `selected`, `required`, `readonly`,
 `multiple`, `autofocus`, `hidden`.
@@ -130,7 +132,8 @@ Event helpers: `on_click`, `on_input`, `on_change`, `on_submit`, `on_focus`,
 `on_scroll`, `on_load`, `on_contextmenu`, `on_wheel`.
 
 > Names ending in `_` avoid clashes with language keywords or libc functions:
-> `div_`, `main_`, `time_`, `select_`, `map_`, `template_` (and `var_` in C3).
+> `div_`, `main_`, `time_`, `select_`, `map_`, `template_` (and `var_` in C3
+> and Zig; the attribute `type` is `type_` in Zig).
 
 ## Routing
 

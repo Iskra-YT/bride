@@ -19,6 +19,7 @@ This `docs/` directory explains how to use Bride in a given language.
 | [C](c.md) | How to use Bride in C. |
 | [C++](cpp.md) | How to use Bride in C++. |
 | [C3](c3.md) | How to use Bride in C3. |
+| [Zig](zig.md) | How to use Bride in Zig. |
 | [Adding a language](adding-a-language.md) | Support criteria and how to port Bride to a new language. |
 
 ## What makes a language supported?

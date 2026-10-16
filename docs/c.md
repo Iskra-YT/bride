@@ -1,7 +1,7 @@
 # Using Bride in C
 
 C is the reference language for Bride. The high-level DSL is implemented in C
-and the C header is what C++ and C3 build on top of.
+and the C header is what C++, C3, and Zig build on top of.
 
 ## Requirements
 

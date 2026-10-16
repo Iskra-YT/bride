@@ -16,7 +16,7 @@ test("getBrideFolder matches getBrideRoot so C++ include paths stay valid", () =
 });
 
 test("isSourceFile accepts every supported source extension", () => {
-    for (const extension of [".c", ".h", ".cpp", ".hpp", ".c3"]) {
+    for (const extension of [".c", ".h", ".cpp", ".hpp", ".c3", ".zig"]) {
         assert.equal(isSourceFile(`main${extension}`), true);
     }
 });

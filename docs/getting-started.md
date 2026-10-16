@@ -7,8 +7,8 @@ The workflow is the same for every supported language — you only change the
 ## Prerequisites
 
 - **Node.js 18 or newer** — required for the Bride CLI and runtime.
-- **Emscripten SDK** — provides `emcc`, `em++`, and `emar`. Required for C,
-  C++, and C3 projects.
+- **Emscripten SDK** — provides `emcc`, `em++`, and `emar`. Required for every
+  language.
 
 Language-specific requirements:
 
@@ -17,6 +17,7 @@ Language-specific requirements:
 | C        | Emscripten only |
 | C++      | Emscripten only |
 | C3       | Emscripten **and** the C3 compiler (`c3c`) |
+| Zig      | Emscripten **and** the Zig compiler (`zig`) |
 
 ## Create a project
 
@@ -32,8 +33,8 @@ npm install bride-cli
 npx bride new c
 ```
 
-Replace `c` with `cpp` or `c3` for those languages. If you omit the language,
-C is used by default.
+Replace `c` with `cpp`, `c3`, or `zig` for those languages. If you omit the
+language, C is used by default.
 
 `bride new` copies the matching template from `template/<language>/` into the
 current directory.
@@ -47,7 +48,7 @@ my-app/
 ├── index.html        # Page that hosts the app (contains <main id="app">)
 ├── main.js           # Loads the WASM module through the Bride runtime
 ├── src/
-│   └── main.c        # Your application source (main.cpp / main.c3 also possible)
+│   └── main.c        # Your app source (main.cpp / main.c3 / main.zig also possible)
 ├── package.json      # Must contain the "language" field
 └── dist/             # Build output (generated)
 ```
@@ -86,8 +87,9 @@ npx bride dev
 ```
 
 This builds the project, starts a static server at
-`http://localhost:9876`, and watches `src/` for changes. When a `.c`, `.h`, or
-`.c3` file changes, Bride rebuilds and reloads the browser automatically.
+`http://localhost:9876`, and watches `src/` for changes. When a `.c`, `.h`,
+`.c3`, or `.zig` file changes, Bride rebuilds and reloads the browser
+automatically.
 
 If your app uses the [router](api-reference.md#routing), the dev server also
 serves `index.html` for unknown paths, so deep links like `/about` work on a
@@ -101,4 +103,5 @@ serve it behind any web server. No server-side runtime is required.
 ## Next steps
 
 - Read the [API reference](api-reference.md) for the full DSL.
-- Pick your language guide: [C](c.md), [C++](cpp.md), or [C3](c3.md).
+- Pick your language guide: [C](c.md), [C++](cpp.md), [C3](c3.md), or
+  [Zig](zig.md).

@@ -35,6 +35,7 @@ directory**. If `language` is omitted it defaults to `c`.
 | C        | `c`              | — |
 | C++      | `cpp`            | — |
 | C3       | `c3`             | `c3c` |
+| Zig      | `zig`            | `zig` |
 
 `bride new` copies into the current working directory, so create and enter the
 target directory first:
@@ -60,7 +61,7 @@ entirely by `package.json`:
 
 | Field | Required | Default | Meaning |
 |-------|----------|---------|---------|
-| `language` | **yes** | — | Which toolchain to use: `c`, `cpp`, or `c3`. |
+| `language` | **yes** | — | Which toolchain to use: `c`, `cpp`, `c3`, or `zig`. |
 | `src` | no | `src` | Directory scanned for project sources. |
 
 The build performs the following steps:
@@ -83,6 +84,7 @@ The build performs the following steps:
 | `c`   | `emcc`, `emar` | Every `.c` file under `src/` is compiled and linked with `libbride.a` into `dist/main.wasm`. `lib/c` is added to the include path. |
 | `cpp` | `em++`, `emcc`, `emar` | Every `.cpp` file under `src/` is compiled and linked with `libbride.a` into `dist/main.wasm`. Both `lib/c` and `lib/cpp` are added to the include path. |
 | `c3`  | `c3c`, `emcc` | `c3c build` compiles `src/**` to object files under `dist/lib/obj/`, a small generated C entry shim is compiled with `emcc`, and everything is linked with `libbride.a` into `dist/main.wasm`. |
+| `zig` | `zig`, `emcc` | `zig build-obj` compiles `src/**` together with a small generated Zig entry point into a wasm object, which is linked with `libbride.a` into `dist/main.wasm`. |
 
 Source files are discovered **recursively**. Only the extension listed above is
 picked up — headers are not compiled on their own, they are pulled in through
@@ -91,7 +93,7 @@ picked up — headers are not compiled on their own, they are pulled in through
 The build throws a clear error when:
 
 - `package.json` has no `language` field.
-- the required compiler is not on `PATH` (`emcc`, `em++`, or `c3c`);
+- the required compiler is not on `PATH` (`emcc`, `em++`, `c3c`, or `zig`);
 - no matching source files are found under `src/`;
 - (C3) `c3c` produced no object files, usually because `project.json` is not
   targeting `emscripten`.
@@ -132,8 +134,8 @@ Runs `bride build`, then starts a development server:
   `application/octet-stream`.
 - Injects a small live-reload `<script>` before `</body>` of every HTML
   response, connected to the server over a WebSocket.
-- Watches `src/` **recursively**. When a `.c`, `.h`, `.cpp`, `.hpp`, or `.c3`
-  file changes, it rebuilds and tells every connected browser to reload.
+- Watches `src/` **recursively**. When a `.c`, `.h`, `.cpp`, `.hpp`, `.c3`, or
+  `.zig` file changes, it rebuilds and tells every connected browser to reload.
 
 Rebuilds are serialized: if a change arrives while a build is running, one more
 build is queued and run afterwards. A failed rebuild is logged and does not stop
@@ -156,7 +158,7 @@ an unknown option aborts with an error before anything is built.
 ```sh
 mkdir my-app && cd my-app
 npm install bride-cli
-npx bride new c          # or cpp / c3
+npx bride new c          # or cpp / c3 / zig
 npx bride build          # one-off production build into dist/
 npx bride dev            # local development on http://localhost:9876
 ```
@@ -172,12 +174,12 @@ then run the result.
 
 ```sh
 npm run smoke                  # C, executed in Node.js
-npm run smoke -- --lang cpp    # a different language: c, cpp or c3
+npm run smoke -- --lang cpp    # a different language: c, cpp, c3 or zig
 npm run smoke -- --browser     # also open the built app in Chromium
 ```
 
 Everything happens in a throw-away directory, so the repository is left as it
-was. Emscripten (and `c3c` for C3) has to be on `PATH`.
+was. Emscripten (and `c3c` for C3, `zig` for Zig) has to be on `PATH`.
 
 | Step | What is verified |
 |------|------------------|

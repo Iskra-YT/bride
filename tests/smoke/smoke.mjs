@@ -7,7 +7,8 @@
  *
  *   node tests/smoke/smoke.mjs [options]
  *
- *   --lang <c|cpp|c3>[,<c|cpp|c3>]   language(s) to scaffold (default: c)
+ *   --lang <c|cpp|c3|zig>[,<c|cpp|c3|zig>]
+ *                                    language(s) to scaffold (default: c)
  *   --browser                        also run the built app in Chromium
  *                                    (installs Playwright into the app first)
  *   --keep                           keep the workspace afterwards

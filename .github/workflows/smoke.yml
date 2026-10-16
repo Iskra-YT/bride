@@ -21,7 +21,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [c, cpp, c3]
+        language: [c, cpp, c3, zig]
 
     steps:
       - uses: actions/checkout@v4
@@ -59,6 +59,19 @@ jobs:
           echo "$c3_dir" >> "$GITHUB_PATH"
           export PATH="$c3_dir:$PATH"
           c3c --version
+
+      - name: Install the Zig compiler
+        if: matrix.language == 'zig'
+        run: |
+          set -euo pipefail
+          zig_version=0.17.0
+          zig_dir="$HOME/.local/zig"
+          mkdir -p "$zig_dir"
+          curl -fsSL "https://ziglang.org/download/$zig_version/zig-x86_64-linux-$zig_version.tar.xz" \
+            | tar -xJ -C "$zig_dir" --strip-components=1
+          echo "$zig_dir" >> "$GITHUB_PATH"
+          export PATH="$zig_dir:$PATH"
+          zig version
 
       - name: Pack Bride, install it, scaffold and build it
         run: |

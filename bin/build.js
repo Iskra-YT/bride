@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { writeFile } from "node:fs/promises";
 
-import { compileDotA, compileC, compileCpp, compileC3 } from "./compile.js";
+import { compileDotA, compileC, compileCpp, compileC3, compileZig } from "./compile.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -34,7 +34,7 @@ export async function buildProject() {
     } else if (projectLanguage === "rust") {
         // TODO: Crate Rust Language Compiler
     } else if (projectLanguage === "zig") {
-        // TODO: Create Zig Language Compiler
+        await compileZig(src, archive);
     } else if (projectLanguage === "cpp") {
         await compileCpp(src, archive);
     }
