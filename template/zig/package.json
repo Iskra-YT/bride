@@ -4,6 +4,6 @@
   "language": "zig",
   "private": true,
   "dependencies": {
-    "bride-cli": "^1.1.0"
+    "bride-cli": "^1.2.0"
   }
 }
