@@ -13,10 +13,18 @@ on:
     # Weekly, so a broken toolchain release is caught even without a commit.
     - cron: "0 6 * * 1"
 
+# A newer push to the same ref makes older runs pointless — cancel them
+# (but never cancel runs on main, where every commit should get a verdict).
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
   smoke:
     name: ${{ matrix.language }}
-    runs-on: ubuntu-latest
+    # Pinned: `ubuntu-latest` migrates to a new LTS every couple of years and
+    # that silently changes the toolchains (Emscripten, C3, Zig).
+    runs-on: ubuntu-24.04
 
     strategy:
       fail-fast: false
@@ -24,19 +32,21 @@ jobs:
         language: [c, cpp, c3, zig]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Use Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 22
 
-      # `bride build` compiles with emcc, em++ and emar. Pin a version (for
-      # example "4.0.7") if you want the action to cache the SDK between runs.
+      # `bride build` compiles with emcc, em++ and emar. The version is pinned
+      # so the action caches the SDK between runs (a `latest` version would
+      # not) and so a new Emscripten release can't break CI without a commit.
       - name: Install Emscripten
         uses: emscripten-core/setup-emsdk@v15
         with:
-          version: latest
+          version: "6.0.12"
+          actions-cache-folder: "emsdk-cache"
 
       - name: Check the toolchain
         run: |
@@ -80,7 +90,7 @@ jobs:
 
       - name: Upload the built app
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: smoke-dist-${{ matrix.language }}
           path: ${{ runner.temp }}/bride-smoke/app-*/dist
@@ -90,20 +100,22 @@ jobs:
   # browser side of the runtime (ES modules, streaming WASM compilation, DOM).
   browser:
     name: chromium
-    runs-on: ubuntu-latest
+    # Pinned, like the smoke job above.
+    runs-on: ubuntu-24.04
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Use Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: 22
 
       - name: Install Emscripten
         uses: emscripten-core/setup-emsdk@v15
         with:
-          version: latest
+          version: "6.0.12"
+          actions-cache-folder: "emsdk-cache"
 
       - name: Pack, build and run the app in Chromium
         run: |
@@ -112,7 +124,7 @@ jobs:
 
       - name: Upload the built app
         if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: smoke-dist-chromium
           path: ${{ runner.temp }}/bride-smoke/app-*/dist

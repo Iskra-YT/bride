@@ -1,5 +1,9 @@
 # Bride
 
+[![CI](https://github.com/Iskra-YT/bride/actions/workflows/ci.yml/badge.svg)](https://github.com/Iskra-YT/bride/actions/workflows/ci.yml)
+[![Smoke](https://github.com/Iskra-YT/bride/actions/workflows/smoke.yml/badge.svg)](https://github.com/Iskra-YT/bride/actions/workflows/smoke.yml)
+[![npm](https://img.shields.io/npm/v/bride-cli)](https://www.npmjs.com/package/bride-cli)
+
 Bride is the runtime bridge between WebAssembly and the Web. 
 
 **Main idea**: Any language can be a web language.

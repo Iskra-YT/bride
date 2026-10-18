@@ -1,0 +1,22 @@
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      eslint:
+        patterns:
+          - eslint
+          - "@eslint/*"
+          - globals
+      wasi:
+        patterns:
+          - "@bjorn3/browser_wasi_shim"
+
+  # Keeps actions/checkout, actions/setup-node, setup-emsdk, ... up to date.
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

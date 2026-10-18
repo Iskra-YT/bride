@@ -5,26 +5,38 @@ on:
     branches: [main, master]
   pull_request:
 
+# A newer push to the same ref makes older runs pointless — cancel them
+# (but never cancel runs on main, where every commit should get a verdict).
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
 jobs:
   test:
-    runs-on: ubuntu-latest
+    # Pinned: `ubuntu-latest` migrates to a new LTS every couple of years and
+    # that silently changes the toolchains (see the Emscripten/C3 setup).
+    runs-on: ubuntu-24.04
 
     strategy:
       fail-fast: false
       matrix:
-        node-version: [20, 22, 24]
+        # 20 is EOL, 26 is current.
+        node-version: [22, 24, 26]
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Use Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: ${{ matrix.node-version }}
           cache: npm
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Audit dependencies
+        run: npm audit --audit-level=high
 
       - name: Lint
         run: npm run lint
