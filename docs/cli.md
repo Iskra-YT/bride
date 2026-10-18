@@ -12,7 +12,7 @@ bride <command> [arguments]
 
 | Command | Purpose |
 |---------|---------|
-| [`bride new`](#bride-new) | Scaffold a new project from a template. |
+| [`bride create`](#bride-create) | Scaffold a new project into a new directory. |
 | [`bride build`](#bride-build) | Compile the project into `dist/`. |
 | [`bride dev`](#bride-dev) | Build, serve, and live-reload while you edit (`--port`, `--host`). |
 
@@ -21,37 +21,40 @@ and exits.
 
 ---
 
-## `bride new`
+## `bride create`
 
 ```sh
-bride new [language]
+bride create <name> [--lang <language>]
 ```
 
-Copies the shared files from `template/_common/` and the language files from
-`template/<language>/` into the **current directory**, then generates
-`package.json` (the `language` argument, and a `bride-cli` range pinned to the
-running CLI version) and writes the merged `.gitignore`. If `language` is
-omitted it defaults to `c`.
+Creates a new directory `<name>`, copies the shared files from
+`template/_common/` and the language files from `template/<language>/` into it,
+then generates `package.json` (the `--lang` value, and a `bride-cli` range
+pinned to the running CLI version) and writes the merged `.gitignore`. If
+`--lang` is omitted it defaults to `c`. Both option spellings are accepted:
+`--lang c` and `--lang=c`.
 
-| Language | `language` value | Extra toolchain besides Emscripten |
-|----------|------------------|------------------------------------|
-| C        | `c`              | — |
-| C++      | `cpp`            | — |
-| C3       | `c3`             | `c3c` |
-| Zig      | `zig`            | `zig` |
-
-`bride new` copies into the current working directory, so create and enter the
-target directory first:
+| Language | `--lang` value | Extra toolchain besides Emscripten |
+|----------|----------------|------------------------------------|
+| C        | `c`            | — |
+| C++      | `cpp`          | — |
+| C3       | `c3`           | `c3c` |
+| Zig      | `zig`          | `zig` |
 
 ```sh
-mkdir my-app
+npx bride create my-app --lang c
 cd my-app
-npx bride new c
 ```
 
-If `language` is not one of the available templates, the command prints a clear
-error listing the available languages and exits with a non-zero status. When in
-doubt, scaffold without a language to get C.
+The command fails when:
+
+- `<name>` is missing;
+- `--lang` is not one of the available templates (the error lists the available
+  languages);
+- the target directory already exists and is not empty;
+- `--lang` is given without a value, or an unknown option is passed.
+
+When in doubt, omit `--lang` to get C.
 
 ## `bride build`
 
@@ -159,9 +162,9 @@ an unknown option aborts with an error before anything is built.
 ## Typical workflow
 
 ```sh
-mkdir my-app && cd my-app
 npm install bride-cli
-npx bride new c          # or cpp / c3 / zig
+npx bride create my-app --lang c   # or cpp / c3 / zig
+cd my-app
 npx bride build          # one-off production build into dist/
 npx bride dev            # local development on http://localhost:9876
 ```
@@ -172,8 +175,8 @@ runtime is required.
 ## Smoke testing the package
 
 `tests/smoke/` checks the package the way a user consumes it: `npm pack`, install
-the tarball into an empty directory, `bride new <language>`, `bride build`, and
-then run the result.
+the tarball into an empty directory, `bride create app --lang <language>`,
+`bride build`, and then run the result.
 
 ```sh
 npm run smoke                  # C, executed in Node.js
@@ -188,7 +191,7 @@ was. Emscripten (and `c3c` for C3, `zig` for Zig) has to be on `PATH`.
 |------|------------------|
 | `npm pack` | the tarball is created, and the installed CLI is that tarball |
 | `npm install <tarball>` | the published package pulls in its own dependencies |
-| `bride new <language>` | every language template scaffolds a project |
+| `bride create app --lang <language>` | every language template scaffolds a project |
 | `bride build` | the build succeeds and produces the documented output |
 | `run-app.mjs` | the built app renders, routes and handles clicks without errors |
 | `browser.mjs` | the same in Chromium, with no console or page errors |

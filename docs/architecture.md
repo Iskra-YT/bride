@@ -244,7 +244,7 @@ object is linked by `emcc`.
 | Path | Role |
 |------|------|
 | `bin/bride.js` | CLI entry point and dev server. |
-| `bin/new.js` | Template copy for `bride new`. |
+| `bin/create.js` | Template copy for `bride create`. |
 | `bin/build.js` | Build orchestration and asset copying. |
 | `bin/compile.js` | Per-language compile steps and `libbride.a`. |
 | `bin/utils.js` | Toolchain detection and file helpers. |
@@ -262,7 +262,7 @@ object is linked by `emcc`.
 | `lib/bride.c3` | Native C3 bindings. |
 | `lib/zig/bride.zig` | Native Zig bindings. |
 | `template/_common/` | Files shared by every starter project: `index.html`, `main.js`, `gitignore`, `src/.gitkeep`. `package.json` is generated instead. |
-| `template/<language>/` | What differs per language, copied on top of `_common` by `bride new`. |
+| `template/<language>/` | What differs per language, copied on top of `_common` by `bride create`. |
 
 ## See also
 

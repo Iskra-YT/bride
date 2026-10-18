@@ -16,6 +16,22 @@ export function normalizePath(path) {
     return clean || "/";
 }
 
+// Route paths are static once registered, so their normalized form is
+// computed once and reused on every render instead of re-running the
+// split/replace pipeline for each route on each navigation.
+const normalizedRoutes = new Map();
+
+function normalizeRoutePath(path) {
+    let normalized = normalizedRoutes.get(path);
+
+    if (normalized === undefined) {
+        normalized = normalizePath(path);
+        normalizedRoutes.set(path, normalized);
+    }
+
+    return normalized;
+}
+
 export function matchRoute(routes, pathname) {
     const target = normalizePath(pathname);
 
@@ -28,7 +44,7 @@ export function matchRoute(routes, pathname) {
             continue;
         }
 
-        if (normalizePath(route.path) === target) {
+        if (normalizeRoutePath(route.path) === target) {
             return route;
         }
     }
@@ -43,7 +59,7 @@ export function matchRoute(routes, pathname) {
         }
 
         if (route.path.endsWith("*")) {
-            const prefix = normalizePath(route.path.slice(0, -1));
+            const prefix = normalizeRoutePath(route.path.slice(0, -1));
 
             if (
                 prefix === "/" ||

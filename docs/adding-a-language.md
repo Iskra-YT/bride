@@ -22,7 +22,7 @@ If any one of these is missing, the language is not supported yet.
 Add `docs/<language>.md` following the structure of the existing guides:
 
 - Requirements (Node.js, Emscripten, any extra compiler).
-- How to create a project (`bride new <language>`).
+- How to create a project (`bride create <name> --lang <language>`).
 - How to import the library.
 - A complete, copy-pasteable example.
 - Build and run instructions.
@@ -57,7 +57,7 @@ Wire the language into the CLI:
 1. **Template** — add `template/<language>/` with only what differs from the
    shared base: a `src/` folder containing a runnable example, plus any extra
    toolchain files (`project.json` for C3) or extra ignore lines in a plain
-   `gitignore` file. `bride new <language>` copies `template/_common/` first
+   `gitignore` file. `bride create <name> --lang <language>` copies `template/_common/` first
    (shared `index.html`, `main.js`, `gitignore`, `src/.gitkeep`), then this
    folder on top of it, and generates `package.json` with `"language"` set to
    the CLI value and `"bride-cli"` pinned to the running CLI version. A

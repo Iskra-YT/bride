@@ -1,0 +1,87 @@
+name: Benchmarks
+
+# Measures the C HTML serializer, the compile time of the C library and (with
+# Emscripten) a full `bride build` plus repeated rendering through the built
+# wasm module. Results are written as JSON, uploaded as an artifact and
+# summarized in the job summary.
+#
+# This workflow deliberately enforces no regression thresholds and never
+# modifies branches: it builds a baseline. Deciding when a change is "too
+# slow" needs several runs of history first (see benchmarks/README.md).
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - "lib/**"
+      - "runtime/**"
+      - "bin/**"
+      - "template/**"
+      - "benchmarks/**"
+      - "tests/smoke/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/benchmark.yml"
+  pull_request:
+    paths:
+      - "lib/**"
+      - "runtime/**"
+      - "bin/**"
+      - "template/**"
+      - "benchmarks/**"
+      - "tests/smoke/**"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/benchmark.yml"
+  workflow_dispatch:
+
+# A newer push to the same ref makes older runs pointless — cancel them
+# (but never cancel runs on main, where every commit should get a baseline).
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+permissions:
+  contents: read
+
+jobs:
+  benchmark:
+    # Pinned and matching the other workflows: cross-run comparisons are only
+    # meaningful on a stable runner image and toolchain.
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Use Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Same pinned Emscripten as smoke.yml, so the numbers describe the
+      # toolchain users actually build with.
+      - name: Install Emscripten
+        uses: emscripten-core/setup-emsdk@v16
+        with:
+          version: "6.0.12"
+          actions-cache-folder: "emsdk-cache"
+
+      - name: Check the toolchain
+        run: |
+          cc --version
+          emcc --version
+
+      - name: Run benchmarks
+        run: node benchmarks/run.mjs
+
+      - name: Upload the results
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: benchmark-results
+          path: benchmarks/results/benchmark-results.json
+          if-no-files-found: error

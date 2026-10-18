@@ -11,13 +11,12 @@ and the C header is what C++, C3, and Zig build on top of.
 ## Create a project
 
 ```sh
-mkdir my-app
-cd my-app
 npm install bride-cli
-npx bride new c
+npx bride create my-app --lang c
+cd my-app
 ```
 
-This copies `template/_common/` and `template/c/` into the current directory and
+This copies `template/_common/` and `template/c/` into `my-app/` and
 writes a `package.json` with `"language": "c"`.
 
 ## Include the header

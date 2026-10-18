@@ -11,13 +11,12 @@ lives in the `bride` namespace.
 ## Create a project
 
 ```sh
-mkdir my-app
-cd my-app
 npm install bride-cli
-npx bride new cpp
+npx bride create my-app --lang cpp
+cd my-app
 ```
 
-This copies `template/_common/` and `template/cpp/` into the current directory
+This copies `template/_common/` and `template/cpp/` into `my-app/`
 and writes a `package.json` with `"language": "cpp"`.
 
 ## Include the header

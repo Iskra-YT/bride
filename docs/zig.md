@@ -15,13 +15,12 @@ to a WebAssembly object with `zig build-obj`, then links it with Emscripten.
 ## Create a project
 
 ```sh
-mkdir my-app
-cd my-app
 npm install bride-cli
-npx bride new zig
+npx bride create my-app --lang zig
+cd my-app
 ```
 
-This copies `template/_common/` and `template/zig/` into the current directory
+This copies `template/_common/` and `template/zig/` into `my-app/`
 and writes a `package.json` with `"language": "zig"`.
 
 ## Import the module

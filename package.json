@@ -20,7 +20,8 @@
   "scripts": {
     "test": "node --test",
     "lint": "eslint .",
-    "smoke": "node tests/smoke/smoke.mjs"
+    "smoke": "node tests/smoke/smoke.mjs",
+    "bench": "node benchmarks/run.mjs"
   },
   "keywords": [
     "wasm",

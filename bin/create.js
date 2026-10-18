@@ -18,7 +18,15 @@ export function listTemplates() {
         .sort();
 }
 
-export function newProject(language = "c") {
+// Scaffolds a project into a new directory: `bride create my-app --lang c`.
+// The target directory must not exist yet, or be empty.
+export function createProject(name, language = "c") {
+    if (!name) {
+        throw new Error(
+            "Missing project name. Usage: bride create <name> [--lang <language>]",
+        );
+    }
+
     const available = listTemplates();
 
     if (!available.includes(language)) {
@@ -27,9 +35,11 @@ export function newProject(language = "c") {
         );
     }
 
+    const target = path.resolve(process.cwd(), name);
+    ensureTargetDirectory(target);
+
     const sharedDir = path.join(templateRoot, sharedFolder);
     const languageDir = path.join(templateRoot, language);
-    const target = process.cwd();
 
     // Shared files first, then the language folder on top of it.
     fs.cpSync(sharedDir, target, { recursive: true });
@@ -38,7 +48,27 @@ export function newProject(language = "c") {
     writeGitignore(sharedDir, languageDir, target);
     writePackageJson(language, target);
 
-    console.log("Bride project created!");
+    console.log(`Bride project created in ${name}!`);
+}
+
+// `create` owns a whole directory, so refuse to overwrite one that already has
+// files in it — that is almost never what the user meant.
+function ensureTargetDirectory(target) {
+    if (!fs.existsSync(target)) {
+        fs.mkdirSync(target, { recursive: true });
+        return;
+    }
+
+    if (!fs.statSync(target).isDirectory()) {
+        throw new Error(`Target "${target}" exists and is not a directory.`);
+    }
+
+    if (fs.readdirSync(target).length > 0) {
+        throw new Error(
+            `Target directory "${target}" is not empty. ` +
+            "Choose a different name or remove the directory first.",
+        );
+    }
 }
 
 function readLines(file) {
@@ -100,8 +130,8 @@ function writePackageJson(language, target) {
     );
 }
 
-// `bin/new.js` runs from the installed bride-cli (or from this repository), so
-// its own package.json is the version a new project should depend on.
+// `bin/create.js` runs from the installed bride-cli (or from this repository),
+// so its own package.json is the version a new project should depend on.
 function cliVersion() {
     const packageJson = JSON.parse(
         fs.readFileSync(path.join(__dirname, "..", "package.json"), "utf8"),

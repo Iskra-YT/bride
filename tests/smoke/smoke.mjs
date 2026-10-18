@@ -2,8 +2,8 @@
 /**
  * End-to-end smoke test of the Bride CLI, following the same steps a user
  * follows: pack the package with `npm pack`, install the tarball into an empty
- * directory, scaffold a project with `bride new <language>`, build it with
- * `bride build` and check that the result actually runs.
+ * directory, scaffold a project with `bride create app --lang <language>`,
+ * build it with `bride build` and check that the result actually runs.
  *
  *   node tests/smoke/smoke.mjs [options]
  *
@@ -26,7 +26,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { listTemplates } from "../../bin/new.js";
+import { listTemplates } from "../../bin/create.js";
 import { verifyDist } from "./verify-dist.mjs";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
@@ -184,9 +184,9 @@ try {
 
         console.log(`\n=== ${language} ===`);
 
-        // The template's package.json depends on "bride-cli" from the registry,
-        // so the tarball is installed before scaffolding and the app is never
-        // asked to resolve bride-cli from npm again.
+        // `bride create` scaffolds a fresh directory, so the CLI has to exist
+        // before the project does: the tarball is installed into this tooling
+        // directory and the project is created inside it.
         run("npm", ["init", "-y"], appDir);
         run(
             "npm",
@@ -199,33 +199,50 @@ try {
             appDir,
         );
 
+        run("npx", ["bride", "create", "app", "--lang", language], appDir);
+
+        const projectDir = path.join(appDir, "app");
+
+        // The generated package.json depends on "bride-cli" from the registry;
+        // installing the packed tarball instead keeps the test running the
+        // packed code and never resolves bride-cli from npm.
+        run(
+            "npm",
+            [
+                "install",
+                path.relative(projectDir, tarball),
+                "--no-audit",
+                "--no-fund",
+            ],
+            projectDir,
+        );
+
         if (browserCheck) {
             run(
                 "npm",
                 ["install", "--no-save", "--no-audit", "--no-fund", "playwright"],
-                appDir,
+                projectDir,
             );
-            run("npx", ["playwright", "install", "--with-deps", "chromium"], appDir);
+            run("npx", ["playwright", "install", "--with-deps", "chromium"], projectDir);
         }
 
-        run("npx", ["bride", "new", language], appDir);
-        run("npx", ["bride", "build"], appDir);
+        run("npx", ["bride", "build"], projectDir);
 
-        checkInstalledCli(appDir);
+        checkInstalledCli(projectDir);
 
         console.log("\nChecking the build output...");
-        const problems = await verifyDist(path.join(appDir, "dist"));
+        const problems = await verifyDist(path.join(projectDir, "dist"));
 
         if (problems.length > 0) {
             failed = true;
         }
 
         console.log("\nRunning the built app in Node.js...");
-        runNodeScript("run-app.mjs", ["--dist", path.join(appDir, "dist")], appDir);
+        runNodeScript("run-app.mjs", ["--dist", path.join(projectDir, "dist")], projectDir);
 
         if (browserCheck) {
             console.log("\nRunning the built app in Chromium...");
-            runNodeScript("browser.mjs", ["--app", appDir], appDir);
+            runNodeScript("browser.mjs", ["--app", projectDir], projectDir);
         }
     }
 } catch (error) {

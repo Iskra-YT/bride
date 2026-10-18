@@ -1,8 +1,8 @@
 name: Smoke
 
 # Tests the package the way a user consumes it: `npm pack`, install the tarball
-# into an empty directory, `bride new <language>`, `bride build`, and then run
-# the result. See tests/smoke/smoke.mjs.
+# into an empty directory, `bride create app --lang <language>`, `bride build`,
+# and then run the result. See tests/smoke/smoke.mjs.
 
 on:
   push:
@@ -93,7 +93,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: smoke-dist-${{ matrix.language }}
-          path: ${{ runner.temp }}/bride-smoke/app-*/dist
+          path: ${{ runner.temp }}/bride-smoke/app-*/app/dist
           if-no-files-found: ignore
 
   # The same flow in a real browser: this is what catches problems on the
@@ -127,5 +127,5 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: smoke-dist-chromium
-          path: ${{ runner.temp }}/bride-smoke/app-*/dist
+          path: ${{ runner.temp }}/bride-smoke/app-*/app/dist
           if-no-files-found: ignore

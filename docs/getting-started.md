@@ -21,25 +21,25 @@ Language-specific requirements:
 
 ## Create a project
 
-Install Bride, then scaffold a project into the current directory with
-`bride new <language>`:
+Install Bride, then scaffold a project with `bride create <name> --lang
+<language>`. The CLI has to be installed before the project exists, so install
+it in the directory you want to work from:
 
 ```sh
-mkdir my-app
-cd my-app
-
 npm install bride-cli
 
-npx bride new c
+npx bride create my-app --lang c
+cd my-app
 ```
 
-Replace `c` with `cpp`, `c3`, or `zig` for those languages. If you omit the
-language, C is used by default.
+Replace `c` with `cpp`, `c3`, or `zig` for those languages. If you omit
+`--lang`, C is used by default.
 
-`bride new` copies the shared base from `template/_common/` (`index.html`,
-`main.js`, `src/.gitkeep`) plus the language files from `template/<language>/`
-into the current directory, then generates `package.json` and the merged
-`.gitignore`.
+`bride create` creates the `my-app/` directory, copies the shared base from
+`template/_common/` (`index.html`, `main.js`, `src/.gitkeep`) plus the language
+files from `template/<language>/` into it, then generates `package.json` and the
+merged `.gitignore`. It refuses to use a directory that already exists and is
+not empty.
 
 ## Project layout
 
@@ -52,12 +52,12 @@ my-app/
 ├── main.js            # Loads the WASM module through the Bride runtime
 ├── src/
 │   └── main.c         # Your app source (main.cpp / main.c3 / main.zig also possible)
-├── package.json       # Filled in by `bride new`, must contain the "language" field
+├── package.json       # Filled in by `bride create`, must contain the "language" field
 └── dist/              # Build output (created by `bride build`)
 ```
 
 The `language` field in `package.json` tells the CLI which toolchain to use.
-`bride new` generates the file, so the `bride-cli` range always matches the
+`bride create` generates the file, so the `bride-cli` range always matches the
 version that scaffolded the project:
 
 ```json

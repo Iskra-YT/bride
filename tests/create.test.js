@@ -4,12 +4,13 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 
-import { listTemplates, newProject } from "../bin/new.js";
+import { listTemplates, createProject } from "../bin/create.js";
 
 // Scaffolds into a fresh temporary directory and restores the cwd afterwards.
-function scaffold(t, language) {
+// Returns the created project directory.
+function scaffold(t, name, language) {
     const previousCwd = process.cwd();
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "bride-new-"));
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "bride-create-"));
 
     t.after(() => {
         process.chdir(previousCwd);
@@ -17,9 +18,9 @@ function scaffold(t, language) {
     });
 
     process.chdir(dir);
-    newProject(language);
+    createProject(name, language);
 
-    return dir;
+    return path.join(dir, name);
 }
 
 const read = (dir, file) => fs.readFileSync(path.join(dir, file), "utf8");
@@ -42,9 +43,16 @@ test("listTemplates skips the shared template folder", () => {
     }
 });
 
-test("newProject rejects an unknown language with a helpful message", () => {
+test("createProject rejects a missing project name", () => {
     assert.throws(
-        () => newProject("cobol"),
+        () => createProject(undefined, "c"),
+        /Missing project name/,
+    );
+});
+
+test("createProject rejects an unknown language with a helpful message", () => {
+    assert.throws(
+        () => createProject("my-app", "cobol"),
         (error) => {
             assert.match(error.message, /Unknown language "cobol"/);
 
@@ -60,8 +68,26 @@ test("newProject rejects an unknown language with a helpful message", () => {
     );
 });
 
-test("newProject combines the shared files with the language ones", (t) => {
-    const dir = scaffold(t, "zig");
+test("createProject refuses a target directory that is not empty", (t) => {
+    const previousCwd = process.cwd();
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), "bride-create-"));
+
+    t.after(() => {
+        process.chdir(previousCwd);
+        fs.rmSync(dir, { recursive: true, force: true });
+    });
+
+    fs.mkdirSync(path.join(dir, "my-app"));
+    fs.writeFileSync(path.join(dir, "my-app", "notes.txt"), "keep me");
+
+    process.chdir(dir);
+
+    assert.throws(() => createProject("my-app", "c"), /not empty/);
+    assert.equal(read(path.join(dir, "my-app"), "notes.txt"), "keep me");
+});
+
+test("createProject combines the shared files with the language ones", (t) => {
+    const dir = scaffold(t, "my-app", "zig");
 
     assert.ok(fs.existsSync(path.join(dir, "index.html")));
     assert.ok(fs.existsSync(path.join(dir, "main.js")));
@@ -76,16 +102,16 @@ test("newProject combines the shared files with the language ones", (t) => {
     assert.equal(packageJson.language, "zig");
 });
 
-test("newProject only adds the shared ignore lines to the language ones", (t) => {
-    const dir = scaffold(t, "c");
+test("createProject only adds the shared ignore lines to the language ones", (t) => {
+    const dir = scaffold(t, "my-app", "c");
 
     assert.ok(fs.existsSync(path.join(dir, "src", "main.c")));
     assert.equal(read(dir, ".gitignore"), "dist/\n");
     assert.equal(JSON.parse(read(dir, "package.json")).language, "c");
 });
 
-test("newProject generates a package.json pinned to the running CLI", (t) => {
-    const dir = scaffold(t, "c");
+test("createProject generates a package.json pinned to the running CLI", (t) => {
+    const dir = scaffold(t, "my-app", "c");
 
     const cli = JSON.parse(
         fs.readFileSync(new URL("../package.json", import.meta.url), "utf8"),
@@ -99,11 +125,9 @@ test("newProject generates a package.json pinned to the running CLI", (t) => {
     assert.equal(packageJson.dependencies["bride-cli"], `^${cli.version}`);
 });
 
-test("newProject keeps the ignore lines already in the target", (t) => {
-    const dir = scaffold(t, "c");
-    fs.writeFileSync(path.join(dir, ".gitignore"), "node_modules/\n");
+test("createProject defaults to C when no language is given", (t) => {
+    const dir = scaffold(t, "my-app", undefined);
 
-    newProject("cpp");
-
-    assert.equal(read(dir, ".gitignore"), "node_modules/\ndist/\n");
+    assert.ok(fs.existsSync(path.join(dir, "src", "main.c")));
+    assert.equal(JSON.parse(read(dir, "package.json")).language, "c");
 });

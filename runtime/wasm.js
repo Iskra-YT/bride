@@ -24,8 +24,12 @@ export async function loadWasm(path, imports = {}) {
     return instance.instance;
 }
 
+// A single shared decoder. `TextDecoder.decode` is stateless when called
+// without the `stream` argument, so one instance is safe to reuse for every
+// string read out of wasm memory.
+const decoder = new TextDecoder("utf-8");
+
 export function wasmString(memory, ptr, len) {
     const bytes = new Uint8Array(memory.buffer, ptr, len);
-    const decoder = new TextDecoder("utf-8");
     return decoder.decode(bytes);
 }
