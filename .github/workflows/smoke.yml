@@ -43,7 +43,7 @@ jobs:
       # so the action caches the SDK between runs (a `latest` version would
       # not) and so a new Emscripten release can't break CI without a commit.
       - name: Install Emscripten
-        uses: emscripten-core/setup-emsdk@v15
+        uses: emscripten-core/setup-emsdk@v16
         with:
           version: "6.0.12"
           actions-cache-folder: "emsdk-cache"
@@ -112,7 +112,7 @@ jobs:
           node-version: 22
 
       - name: Install Emscripten
-        uses: emscripten-core/setup-emsdk@v15
+        uses: emscripten-core/setup-emsdk@v16
         with:
           version: "6.0.12"
           actions-cache-folder: "emsdk-cache"
