@@ -79,6 +79,16 @@ async function copyData(dist, cwd, brideRoot) {
 dependencies. See the licenses/ directory for applicable licenses.`
     );
 
+    // `dist/` is a self-contained ES-module app (bride.js, wasm.js, router.js
+    // and main.js all use import/export). The project's own package.json may
+    // say otherwise (npm init defaults to CommonJS, newer npm even writes
+    // "type": "commonjs"), so dist/ carries its own to be loadable by Node
+    // regardless of the parent project's settings.
+    await writeFile(
+        path.join(dist, "package.json"),
+        `${JSON.stringify({ type: "module" }, null, 2)}\n`,
+    );
+
     const indexHtml = path.join(cwd, "index.html");
 
     if (existsSync(indexHtml)) {

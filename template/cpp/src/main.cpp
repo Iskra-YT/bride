@@ -8,12 +8,20 @@ void increment(void) {
 }
 
 void home_page(void) {
+    const auto counter_style = bride::style(
+        bride::background("#1e1e2e"),
+        bride::color("#cdd6f4"),
+        bride::padding(12, "px"),
+        bride::border_radius(8, "px")
+    );
+
     bride::ui(
         bride::h1(
             bride::text("Home")
         ),
         bride::p(
             bride::id("counter"),
+            bride::apply(counter_style),
             bride::textf("Clicks: %d", count)
         ),
         bride::button(
