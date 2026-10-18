@@ -17,8 +17,8 @@ npm install bride-cli
 npx bride new cpp
 ```
 
-This copies `template/cpp/` into the current directory. `package.json` must
-contain `"language": "cpp"`.
+This copies `template/_common/` and `template/cpp/` into the current directory
+and writes a `package.json` with `"language": "cpp"`.
 
 ## Include the header
 

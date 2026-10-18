@@ -261,7 +261,8 @@ object is linked by `emcc`.
 | `lib/cpp/` | Header-only C++ re-export of the C API in `namespace bride`. |
 | `lib/bride.c3` | Native C3 bindings. |
 | `lib/zig/bride.zig` | Native Zig bindings. |
-| `template/<language>/` | Starter projects copied by `bride new`. |
+| `template/_common/` | Files shared by every starter project: `index.html`, `main.js`, `gitignore`, `src/.gitkeep`. `package.json` is generated instead. |
+| `template/<language>/` | What differs per language, copied on top of `_common` by `bride new`. |
 
 ## See also
 

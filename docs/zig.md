@@ -21,8 +21,8 @@ npm install bride-cli
 npx bride new zig
 ```
 
-This copies `template/zig/` into the current directory. `package.json` must
-contain `"language": "zig"`.
+This copies `template/_common/` and `template/zig/` into the current directory
+and writes a `package.json` with `"language": "zig"`.
 
 ## Import the module
 

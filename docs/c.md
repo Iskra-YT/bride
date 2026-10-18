@@ -17,8 +17,8 @@ npm install bride-cli
 npx bride new c
 ```
 
-This copies `template/c/` into the current directory. `package.json` must
-contain `"language": "c"`.
+This copies `template/_common/` and `template/c/` into the current directory and
+writes a `package.json` with `"language": "c"`.
 
 ## Include the header
 

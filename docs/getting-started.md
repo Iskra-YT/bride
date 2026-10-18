@@ -36,8 +36,10 @@ npx bride new c
 Replace `c` with `cpp`, `c3`, or `zig` for those languages. If you omit the
 language, C is used by default.
 
-`bride new` copies the matching template from `template/<language>/` into the
-current directory.
+`bride new` copies the shared base from `template/_common/` (`index.html`,
+`main.js`, `src/.gitkeep`) plus the language files from `template/<language>/`
+into the current directory, then generates `package.json` and the merged
+`.gitignore`.
 
 ## Project layout
 
@@ -45,22 +47,27 @@ A freshly scaffolded project looks like this:
 
 ```
 my-app/
-├── index.html        # Page that hosts the app (contains <main id="app">)
-├── main.js           # Loads the WASM module through the Bride runtime
+├── .gitignore         # Ignores the build output
+├── index.html         # Page that hosts the app (contains <main id="app">)
+├── main.js            # Loads the WASM module through the Bride runtime
 ├── src/
-│   └── main.c        # Your app source (main.cpp / main.c3 / main.zig also possible)
-├── package.json      # Must contain the "language" field
-└── dist/             # Build output (generated)
+│   └── main.c         # Your app source (main.cpp / main.c3 / main.zig also possible)
+├── package.json       # Filled in by `bride new`, must contain the "language" field
+└── dist/              # Build output (created by `bride build`)
 ```
 
-The `language` field in `package.json` tells the CLI which toolchain to use:
+The `language` field in `package.json` tells the CLI which toolchain to use.
+`bride new` generates the file, so the `bride-cli` range always matches the
+version that scaffolded the project:
 
 ```json
 {
   "name": "bride-app",
+  "version": "0.1.0",
   "language": "c",
+  "private": true,
   "dependencies": {
-    "bride-cli": "^1.0.0"
+    "bride-cli": "^1.2.0"
   }
 }
 ```

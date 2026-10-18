@@ -27,8 +27,11 @@ and exits.
 bride new [language]
 ```
 
-Copies the matching template from `template/<language>/` into the **current
-directory**. If `language` is omitted it defaults to `c`.
+Copies the shared files from `template/_common/` and the language files from
+`template/<language>/` into the **current directory**, then generates
+`package.json` (the `language` argument, and a `bride-cli` range pinned to the
+running CLI version) and writes the merged `.gitignore`. If `language` is
+omitted it defaults to `c`.
 
 | Language | `language` value | Extra toolchain besides Emscripten |
 |----------|------------------|------------------------------------|

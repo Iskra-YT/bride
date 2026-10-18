@@ -54,10 +54,15 @@ events through the same `Bride.dispatch(n)` mechanism used by the runtime.
 
 Wire the language into the CLI:
 
-1. **Template** — add `template/<language>/` with `index.html`, `main.js`,
-   a `src/` folder containing a runnable example, and a `package.json`
-   whose `"language"` field matches the CLI value. `bride new <language>` copies
-   this folder verbatim.
+1. **Template** — add `template/<language>/` with only what differs from the
+   shared base: a `src/` folder containing a runnable example, plus any extra
+   toolchain files (`project.json` for C3) or extra ignore lines in a plain
+   `gitignore` file. `bride new <language>` copies `template/_common/` first
+   (shared `index.html`, `main.js`, `gitignore`, `src/.gitkeep`), then this
+   folder on top of it, and generates `package.json` with `"language"` set to
+   the CLI value and `"bride-cli"` pinned to the running CLI version. A
+   `package.json` shipped by the language folder is reused, with only
+   `"language"` filled in.
 
 2. **Compiler detection** — add a `hasX()` helper in `bin/utils.js` that probes
    the compiler (see `hasEmcc`, `hasEmpp`, `hasC3c`, `hasZig`).
@@ -82,7 +87,7 @@ Wire the language into the CLI:
 
 - [ ] `docs/<language>.md` exists and is linked from the indexes.
 - [ ] `lib/<language>/` contains working bindings.
-- [ ] `template/<language>/` contains a runnable starter project.
+- [ ] `template/<language>/` adds a runnable example on top of `template/_common/`.
 - [ ] `bin/utils.js` can detect the compiler.
 - [ ] `bin/compile.js` can build the project.
 - [ ] `bin/build.js` dispatches to the new compiler.

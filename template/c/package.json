@@ -1,9 +1,0 @@
-{
-  "name": "bride-app",
-  "version": "0.1.0",
-  "language": "c",
-  "private": true,
-  "dependencies": {
-    "bride-cli": "^1.2.0"
-  }
-}

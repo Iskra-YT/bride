@@ -617,7 +617,7 @@ await Bride.start({
 
 | Method | Description |
 |--------|-------------|
-| `Bride.start(options)` | Instantiates the module, wires the `commit`, `commit_at`, and `add_at` imports, calls the WASI initializer, and runs the module's `_start`. Reports failures through `onError` (default `console.error`) and stops; it does not throw for a missing `root`, an already-initialized runtime, a failed module load, or a module without exported memory. |
+| `Bride.start(options)` | Instantiates the module, wires the `commit`, `commit_at`, and `add_at` imports, calls the WASI initializer, and runs the module's `_start`. Reports failures through `onError` (default `console.error`) and stops |
 | `Bride.dispatch(number)` | Calls the event handler registered under `number`. Used internally by generated `on*` attributes. |
 | `Bride.navigate(path)` | Client-side navigation: pushes a history entry and renders the matching route. |
 | `Bride.render()` | Re-renders the route matching the current URL. |
