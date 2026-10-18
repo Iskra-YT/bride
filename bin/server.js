@@ -1,6 +1,7 @@
 import { createServer } from "node:http";
 import { readFile, watch } from "node:fs/promises";
 import { WebSocketServer } from "ws";
+import { buildProject } from "./build.js";
 import { getContentType, isSourceFile, parseDevOptions } from "./utils.js";
 import path from "node:path";
 
